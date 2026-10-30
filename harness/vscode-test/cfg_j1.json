@@ -1,0 +1,33 @@
+{
+  "modelsJson": "../vscode-cfg/via_proxy_responses.json",
+  "scenario": "j1-byok-flag-off",
+  "pathPrepend": "C:\\Users\\USER\\Local\\apim-harness-test\\fakeaz",
+  "settings": {
+    "chat.agentHost.byokModels.enabled": false
+  },
+  "steps": [
+    {
+      "do": "shot",
+      "name": "start"
+    },
+    {
+      "x": 1271,
+      "y": 818,
+      "do": "click_xy"
+    },
+    {
+      "do": "wait",
+      "ms": 2500
+    },
+    {
+      "do": "shot",
+      "name": "picker"
+    },
+    {
+      "do": "text"
+    }
+  ],
+  "extDir": "C:\\Users\\USER\\Local\\apim-harness-test\\vscode-ext-none",
+  "probe": false,
+  "wait_ms": 22000
+}

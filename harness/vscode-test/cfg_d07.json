@@ -1,0 +1,10 @@
+{
+  "scenario": "d07-session-types",
+  "modelsJson": "../vscode-cfg/via_proxy_responses.json",
+  "wait_ms": 14000,
+  "steps": [
+    {"do": "click_xy", "x": 1190, "y": 851},
+    {"do": "wait", "ms": 2000},
+    {"do": "shot", "name": "session-types"}
+  ]
+}

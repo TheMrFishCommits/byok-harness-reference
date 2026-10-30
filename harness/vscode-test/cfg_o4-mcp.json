@@ -1,0 +1,120 @@
+{
+ "scenario": "o4-vscode-mcp-start",
+ "probe": false,
+ "wait_ms": 12000,
+ "extDir": "C:/Users/USER/Local/apim-harness-test/vscode-ext-none",
+ "pathPrepend": "C:/Users/USER/Local/apim-harness-test/fakeaz",
+ "settings": {
+  "mcp": {
+   "servers": {
+    "azure": {
+     "type": "stdio",
+     "command": "C:/Users/USER/Local/apim-harness-test/azure-mcp/node_modules/@azure/mcp-win32-x64/dist/azmcp.exe",
+     "args": [
+      "server",
+      "start",
+      "--read-only",
+      "--disable-proxy-tools"
+     ],
+     "env": {
+      "AZURE_MCP_COLLECT_TELEMETRY": "false",
+      "AZURE_MCP_COLLECT_TELEMETRY_MICROSOFT": "false",
+      "AZURE_TOKEN_CREDENTIALS": "AzureCliCredential"
+     }
+    }
+   }
+  }
+ },
+ "steps": [
+  {
+   "do": "palette",
+   "text": "MCP: List Servers"
+  },
+  {
+   "do": "wait",
+   "ms": 2000
+  },
+  {
+   "do": "press",
+   "key": "ArrowDown"
+  },
+  {
+   "do": "press",
+   "key": "Enter"
+  },
+  {
+   "do": "wait",
+   "ms": 1500
+  },
+  {
+   "do": "press",
+   "key": "Enter"
+  },
+  {
+   "do": "wait",
+   "ms": 12000
+  },
+  {
+   "do": "palette",
+   "text": "MCP: List Servers"
+  },
+  {
+   "do": "wait",
+   "ms": 2500
+  },
+  {
+   "do": "text"
+  },
+  {
+   "do": "shot",
+   "name": "after-start"
+  },
+  {
+   "do": "palette",
+   "text": "MCP: List Servers"
+  },
+  {
+   "do": "wait",
+   "ms": 1500
+  },
+  {
+   "do": "press",
+   "key": "ArrowDown"
+  },
+  {
+   "do": "press",
+   "key": "Enter"
+  },
+  {
+   "do": "wait",
+   "ms": 1200
+  },
+  {
+   "do": "press",
+   "key": "ArrowDown"
+  },
+  {
+   "do": "press",
+   "key": "ArrowDown"
+  },
+  {
+   "do": "press",
+   "key": "ArrowDown"
+  },
+  {
+   "do": "press",
+   "key": "Enter"
+  },
+  {
+   "do": "wait",
+   "ms": 2500
+  },
+  {
+   "do": "text"
+  },
+  {
+   "do": "shot",
+   "name": "output"
+  }
+ ]
+}

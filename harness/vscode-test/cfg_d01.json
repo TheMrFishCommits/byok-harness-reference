@@ -1,0 +1,11 @@
+{
+  "scenario": "d01-chat-state",
+  "modelsJson": "../vscode-cfg/via_proxy_responses.json",
+  "wait_ms": 15000,
+  "steps": [
+    {"do": "palette", "text": "Chat: Open Chat"},
+    {"do": "wait", "ms": 4000},
+    {"do": "shot", "name": "chat-open"},
+    {"do": "text"}
+  ]
+}

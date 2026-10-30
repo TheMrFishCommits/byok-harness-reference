@@ -1,0 +1,194 @@
+{
+  "id": "claude-code-vscode",
+  "harness": "Claude Code extension for VS Code",
+  "product_versions": [
+    "extension 2.1.312 (win32-x64)",
+    "VS Code 1.142.0"
+  ],
+  "os": [
+    "windows"
+  ],
+  "config_locations": [
+    "%USERPROFILE%\\.claude\\settings.json (or the folder named by CLAUDE_CONFIG_DIR in VS Code's environment)",
+    "VS Code user settings: claudeCode.* keys"
+  ],
+  "supports_byok": true,
+  "requires_parent_login_for_byok": false,
+  "can_disable_login_prompt": true,
+  "can_disable_login_prompt_note": "With apiKeyHelper in settings.json no login prompt appeared. Documentation names claudeCode.environmentVariables for a static gateway credential because the extension's own login check reads it; claudeCode.disableLoginPrompt is listed in the extension manifest (behaviour not documented in the pages reviewed).",
+  "telemetry_controls": [
+    {
+      "setting": "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC",
+      "where": "env in settings.json or claudeCode.environmentVariables",
+      "value": "1",
+      "default": "unset",
+      "effect": "Umbrella for updates, telemetry, error reporting, feedback, release notes, availability checks, feature flags and surveys; also turns feedback off in the VS Code panel (2.1.284+).",
+      "evidence": "documented"
+    },
+    {
+      "setting": "DISABLE_TELEMETRY",
+      "where": "env",
+      "value": "1",
+      "default": "on for the Claude API",
+      "effect": "Operational metrics, feature flags and surveys off.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "DISABLE_ERROR_REPORTING",
+      "where": "env",
+      "value": "1",
+      "default": "varies by plan",
+      "effect": "Error reports off.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "DISABLE_AUTOUPDATER",
+      "where": "env",
+      "value": "1",
+      "default": "updates on",
+      "effect": "No automatic background updates.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "DISABLE_FEEDBACK_COMMAND",
+      "where": "env",
+      "value": "1",
+      "default": "unset",
+      "effect": "Disables /feedback, /bug, /share and feedback in the panel.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "CLAUDE_CODE_IDE_SKIP_AUTO_INSTALL",
+      "where": "env",
+      "value": "1",
+      "default": "unset",
+      "effect": "Skips automatic installation of IDE extensions.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "CLAUDE_CODE_AUTO_CONNECT_IDE",
+      "where": "env",
+      "value": "false",
+      "default": "on in an IDE terminal",
+      "effect": "Stops auto-connecting to the IDE (the connection is local).",
+      "evidence": "documented"
+    },
+    {
+      "setting": "telemetry.telemetryLevel",
+      "where": "VS Code settings",
+      "value": "off",
+      "default": "all",
+      "effect": "VS Code's own telemetry off.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "update.mode",
+      "where": "VS Code settings",
+      "value": "none",
+      "default": "default",
+      "effect": "No automatic VS Code update checks.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "extensions.autoCheckUpdates",
+      "where": "VS Code settings",
+      "value": "false",
+      "default": "true",
+      "effect": "Stops background extension update checks (Marketplace).",
+      "evidence": "documented"
+    },
+    {
+      "setting": "extensions.autoUpdate",
+      "where": "VS Code settings",
+      "value": "false",
+      "default": "true",
+      "effect": "Stops automatic extension updates.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "workbench.enableExperiments",
+      "where": "VS Code settings",
+      "value": "false",
+      "default": "true",
+      "effect": "Stops experiment service requests.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "the four Claude variables + the five VS Code settings above",
+      "where": "env and VS Code settings",
+      "value": "as listed",
+      "default": "unset / defaults",
+      "effect": "No connection to Anthropic hosts; VS Code's remaining calls were main.vscode-cdn.net and one unnamed Microsoft address.",
+      "evidence": "observed"
+    }
+  ],
+  "auth": {
+    "method": "apiKeyHelper in the Claude settings.json read by the extension's bundled claude binary; value sent in both Authorization: Bearer and x-api-key",
+    "native_helper_command": true,
+    "static_key_supported": true,
+    "custom_headers_supported": true,
+    "notes": "Helper output is cached 5 minutes by default (CLAUDE_CODE_API_KEY_HELPER_TTL_MS); a 401 on an expired token triggers a helper re-run and one retry. The helper runs in the VS Code process environment, so az must be on that PATH (or use the full path to az.cmd). Do not set ANTHROPIC_AUTH_TOKEN or ANTHROPIC_API_KEY anywhere: they override apiKeyHelper.",
+    "helper_script": "Included in config_snippets as get-apim-token.ps1; prints only the Entra access token for the gateway API, fails fast on wrong audience, expired token or az error."
+  },
+  "api_formats": [
+    "anthropic-messages (POST <base>/v1/messages?beta=true, SSE streaming)"
+  ],
+  "model_discovery_endpoint_behaviour": "Two HEAD <base>/api/hello probes when the panel opens (a 404 is harmless). Gateway model discovery is off by default.",
+  "config_snippets": [
+    {
+      "file": "%USERPROFILE%\\.claude\\settings.json",
+      "format": "json",
+      "content": "{\n  \"apiKeyHelper\": \"powershell -NoProfile -File C:\\\\Users\\\\<you>\\\\bin\\\\get-apim-token.ps1\",\n  \"env\": {\n    \"ANTHROPIC_BASE_URL\": \"https://<apim-host>/<anthropic-api-path>\",\n    \"CLAUDE_CODE_API_KEY_HELPER_TTL_MS\": \"1800000\",\n    \"ANTHROPIC_DEFAULT_OPUS_MODEL\": \"<deployment-name>\",\n    \"ANTHROPIC_DEFAULT_SONNET_MODEL\": \"<deployment-name>\",\n    \"ANTHROPIC_DEFAULT_HAIKU_MODEL\": \"<deployment-name>\",\n    \"CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC\": \"1\",\n    \"DISABLE_TELEMETRY\": \"1\",\n    \"DISABLE_ERROR_REPORTING\": \"1\",\n    \"DISABLE_AUTOUPDATER\": \"1\"\n  }\n}"
+    },
+    {
+      "file": "VS Code settings.json (optional)",
+      "format": "json",
+      "content": "{\n  \"claudeCode.environmentVariables\": [\n    { \"name\": \"ANTHROPIC_BASE_URL\", \"value\": \"https://<apim-host>/<anthropic-api-path>\" },\n    { \"name\": \"CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC\", \"value\": \"1\" },\n    { \"name\": \"DISABLE_TELEMETRY\", \"value\": \"1\" },\n    { \"name\": \"DISABLE_ERROR_REPORTING\", \"value\": \"1\" },\n    { \"name\": \"DISABLE_AUTOUPDATER\", \"value\": \"1\" }\n  ]\n}"
+    },
+    {
+      "file": "VS Code settings.json (quieter VS Code)",
+      "format": "json",
+      "content": "{\n  \"telemetry.telemetryLevel\": \"off\",\n  \"update.mode\": \"none\",\n  \"extensions.autoCheckUpdates\": false,\n  \"extensions.autoUpdate\": false,\n  \"workbench.enableExperiments\": false\n}"
+    },
+    {
+      "file": "C:\\Users\\<you>\\bin\\get-apim-token.ps1",
+      "format": "powershell",
+      "content": "# Prints ONLY the raw JWT to stdout; on any problem prints a one-line reason to stderr and exits 1.\n# Failing fast matters: both Claude Code and Codex retry hard on a bad token.\n$Scope       = 'api://<apim-app-id>/.default'\n$ExpectedAud = @('api://<apim-app-id>', '<apim-app-client-id>')   # accept both token forms\n$MinLifeSecs = 60\n\n$lines = & az account get-access-token --scope $Scope --query accessToken -o tsv 2>$null\nif ($LASTEXITCODE -ne 0) { [Console]::Error.WriteLine(\"get-apim-token: az failed (exit $LASTEXITCODE). Run: az login\"); exit 1 }\n\n# Tolerate banners/warnings on stdout: keep only the line that looks like a JWT.\n$jwt = $lines | ForEach-Object { \"$_\".Trim() } | Where-Object { $_ -match '^eyJ[\\w-]+\\.[\\w-]+\\.[\\w-]+$' } | Select-Object -Last 1\nif (-not $jwt) { [Console]::Error.WriteLine('get-apim-token: az output contained no JWT'); exit 1 }\n\n# Sanity-check the claims so a wrong audience or nearly-expired token fails here, not as an endless 401 loop.\n$p = $jwt.Split('.')[1].Replace('-', '+').Replace('_', '/')\nwhile ($p.Length % 4) { $p += '=' }\n$claims = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($p)) | ConvertFrom-Json\n$now = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()\nif ($ExpectedAud -notcontains $claims.aud) { [Console]::Error.WriteLine(\"get-apim-token: token aud is '$($claims.aud)', expected '$($ExpectedAud -join \"' or '\")'\"); exit 1 }\nif ($claims.exp - $now -lt $MinLifeSecs) { [Console]::Error.WriteLine(\"get-apim-token: token expires in $($claims.exp - $now)s\"); exit 1 }\n\n[Console]::Out.Write($jwt)"
+    }
+  ],
+  "hosts_default": [
+    "api.anthropic.com (bundled binary)",
+    "main.vscode-cdn.net",
+    "marketplace.visualstudio.com",
+    "www.vscode-unpkg.net"
+  ],
+  "hosts_after_config": [
+    "main.vscode-cdn.net",
+    "one unnamed Microsoft address (150.171.x.x range)"
+  ],
+  "limits": [
+    "No features that depend on feature-flag fetching: Remote Control, claude import, /skill-doctor, claude.ai skill and plugin sync, the advisor tool, MCP tasks, artifact comments, Claude-drafted feedback and idle compaction.",
+    "No automatic updates: update the extension and the bundled binary by hand.",
+    "Model names, context windows and capabilities for custom deployment names are not discovered; set the names explicitly (unrecognised IDs assume 200K context).",
+    "WebFetch needs the hostname check or skipWebFetchPreflight; WebSearch behaviour behind a custom base URL is not documented.",
+    "Remote Control is disabled when the base URL host differs from api.anthropic.com.",
+    "Feedback is off in the panel while the umbrella variable or DISABLE_FEEDBACK_COMMAND is set.",
+    "Extension and Marketplace updates are manual.",
+    "The remaining VS Code CDN fetch has no documented setting.",
+    "The panel needs about 15 seconds to become ready on first open."
+  ],
+  "verification_status": "verified: helper authentication through the extension without a login prompt, panel reply, two api/hello probes, network switch set. claudeCode.environmentVariables and claudeCode.claudeProcessWrapper not verified. Not verified with CLAUDE_CONFIG_DIR unset.",
+  "references": [
+    "https://code.claude.com/docs/en/vs-code",
+    "https://code.claude.com/docs/en/llm-gateway-connect",
+    "https://code.claude.com/docs/en/llm-gateway-protocol",
+    "https://code.claude.com/docs/en/authentication",
+    "https://code.claude.com/docs/en/env-vars",
+    "https://code.claude.com/docs/en/settings",
+    "https://code.claude.com/docs/en/data-usage",
+    "https://code.claude.com/docs/en/network-config",
+    "https://code.claude.com/docs/en/model-config",
+    "https://code.visualstudio.com/docs/setup/network"
+  ],
+  "self_contained": true
+}

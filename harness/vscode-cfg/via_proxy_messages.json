@@ -1,0 +1,19 @@
+[
+  {
+    "name": "APIM-via-proxy-messages",
+    "vendor": "customendpoint",
+    "apiKey": "dummy-local-key",
+    "models": [
+      {
+        "id": "claude-test-apim",
+        "name": "Claude Test via proxy",
+        "url": "http://127.0.0.1:18081/anthropic/v1/messages",
+        "apiType": "messages",
+        "toolCalling": true,
+        "vision": false,
+        "maxInputTokens": 100000,
+        "maxOutputTokens": 8000
+      }
+    ]
+  }
+]

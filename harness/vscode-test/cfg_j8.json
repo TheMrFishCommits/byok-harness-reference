@@ -1,0 +1,52 @@
+{
+  "extDir": "C:\\Users\\USER\\Local\\apim-harness-test\\vscode-ext-none",
+  "pathPrepend": "C:\\Users\\USER\\Local\\apim-harness-test\\fakeaz",
+  "wait_ms": 22000,
+  "scenario": "j4-byok-ui-added",
+  "keepProfile": true,
+  "steps": [
+    {
+      "y": 782,
+      "x": 1250,
+      "do": "click_xy"
+    },
+    {
+      "do": "type",
+      "text": "Reply with the single word: ok"
+    },
+    {
+      "do": "press",
+      "key": "Enter"
+    },
+    {
+      "do": "wait",
+      "ms": 25000
+    },
+    {
+      "do": "shot",
+      "name": "byok-denied"
+    },
+    {
+      "do": "text"
+    }
+  ],
+  "env": {
+    "HTTPS_PROXY": "http://127.0.0.1:18090",
+    "ALL_PROXY": "http://127.0.0.1:18090",
+    "HTTP_PROXY": "http://127.0.0.1:18090",
+    "NO_PROXY": "127.0.0.1,localhost,::1"
+  },
+  "args": [
+    "--log-net-log={base}\\netlog2.json",
+    "--proxy-server=http://127.0.0.1:18090",
+    "--proxy-bypass-list=127.0.0.1;localhost;<-loopback>"
+  ],
+  "settings": {
+    "http.proxy": "http://127.0.0.1:18090",
+    "extensions.autoCheckUpdates": false,
+    "workbench.enableExperiments": false,
+    "telemetry.telemetryLevel": "off",
+    "http.proxySupport": "override"
+  },
+  "probe": false
+}

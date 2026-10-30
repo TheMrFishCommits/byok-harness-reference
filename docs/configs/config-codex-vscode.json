@@ -1,0 +1,197 @@
+{
+  "id": "codex-vscode",
+  "harness": "Codex extension for VS Code",
+  "product_versions": [
+    "extension 26.1021.22027 (win32-x64), bundled Codex 0.164.0 (alpha)",
+    "VS Code 1.142.0"
+  ],
+  "os": [
+    "windows"
+  ],
+  "config_locations": [
+    "%USERPROFILE%\\.codex\\config.toml (or the folder named by CODEX_HOME in VS Code's environment)",
+    "Gear menu in the extension: Codex Settings, Open config.toml"
+  ],
+  "supports_byok": true,
+  "requires_parent_login_for_byok": false,
+  "can_disable_login_prompt": true,
+  "can_disable_login_prompt_note": "No ChatGPT sign-in screen is shown when a custom provider with a command-backed token is configured.",
+  "telemetry_controls": [
+    {
+      "setting": "features.plugins / remote_plugin / plugin_sharing / apps / in_app_updates",
+      "where": "config.toml",
+      "value": "false",
+      "default": "stable, on",
+      "effect": "Stops plugin catalog and curated plugin sync (chatgpt.com, github.com), app and connector integration, in-app updates. Which single flag matters most is not established.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "analytics.enabled",
+      "where": "config.toml",
+      "value": "false",
+      "default": "unset (client default applies)",
+      "effect": "Disables anonymous usage and health data; also disables custom OTLP metrics exporters.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "feedback.enabled",
+      "where": "config.toml",
+      "value": "false",
+      "default": "true",
+      "effect": "Rejects /feedback submissions (user-initiated). Documented, effect not confirmed.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "otel.metrics_exporter",
+      "where": "config.toml",
+      "value": "none",
+      "default": "statsig",
+      "effect": "Disables metrics export independently of logs and traces. Documented, effect not confirmed.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "chatgpt.* extension settings",
+      "where": "VS Code settings",
+      "value": "none applicable",
+      "default": "n/a",
+      "effect": "The manifest lists chatgpt.cliExecutable, openOnStartup, runCodexInWindowsSubsystemForLinux, followUpQueueMode, composerEnterBehavior, reviewDelivery, localeOverride, commentCodeLensEnabled. None controls network, telemetry or login.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "telemetry.telemetryLevel",
+      "where": "VS Code settings",
+      "value": "off",
+      "default": "all",
+      "effect": "Affects VS Code's own telemetry only; the extension's Sentry reports were still sent.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "update.mode / extensions.autoCheckUpdates / extensions.autoUpdate / workbench.enableExperiments",
+      "where": "VS Code settings",
+      "value": "none / false / false / false",
+      "default": "default / true / true / true",
+      "effect": "Reduce VS Code's own Marketplace and experiment calls.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "config.toml keys + VS Code quiet settings",
+      "where": "config.toml and VS Code settings",
+      "value": "as in snippets",
+      "default": "defaults",
+      "effect": "The bundled Codex process opened no external connection; the extension interface and host still contacted chatgpt.com and a Sentry ingest host.",
+      "evidence": "observed"
+    },
+    {
+      "setting": "otel.exporter / otel.trace_exporter",
+      "where": "config.toml",
+      "value": "none",
+      "default": "none for exporter",
+      "effect": "Log and trace export off unless configured.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "web_search",
+      "where": "config.toml",
+      "value": "disabled",
+      "default": "cached",
+      "effect": "Removes the web search tool; full-access sandbox defaults to live. Documented, effect not confirmed.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "mcp_servers.<id>.enabled",
+      "where": "config.toml",
+      "value": "false",
+      "default": "true",
+      "effect": "Disables one MCP server without removing its configuration.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "check_for_update_on_startup",
+      "where": "config.toml",
+      "value": "false",
+      "default": "not stated",
+      "effect": "Stops the update check; documentation advises false only when updates are centrally managed.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "history.persistence",
+      "where": "config.toml",
+      "value": "none",
+      "default": "save-all",
+      "effect": "Local only; no network effect.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "forced_login_method",
+      "where": "config.toml",
+      "value": "api",
+      "default": "not stated",
+      "effect": "Restricts authentication method; whether it avoids chatgpt.com calls is not stated.",
+      "evidence": "documented"
+    }
+  ],
+  "auth": {
+    "method": "[model_providers.<id>.auth] command in the shared config.toml; printed token sent as Authorization: Bearer",
+    "native_helper_command": true,
+    "static_key_supported": true,
+    "custom_headers_supported": true,
+    "notes": "A short refresh_interval_ms gives a fresh token per request; with a long interval or 0, an expired token gets one 401, the helper re-runs and the request is retried. A 401 on a fresh token also re-runs the helper. timeout_ms default 5000 must exceed helper time (15000 used). refresh_interval_ms default 300000. A failing helper runs about 30 times in 25 seconds before failure. Cannot be combined with env_key, experimental_bearer_token or requires_openai_auth. Provider id cannot be openai, ollama or lmstudio. Custom headers via http_headers and env_http_headers; query_params for api-version. The helper runs in the VS Code process environment (az must be on PATH or use the full path). The extension can send an additional /responses request with a model name different from the configured one; the gateway must accept or reject it harmlessly."
+  },
+  "api_formats": [
+    "openai-responses (POST <base_url>/responses, SSE)"
+  ],
+  "model_discovery_endpoint_behaviour": "GET <base_url>/models several times; expects {\"models\": [...]}; mismatch is non-fatal.",
+  "config_snippets": [
+    {
+      "file": "%USERPROFILE%\\.codex\\config.toml",
+      "format": "toml",
+      "content": "model = \"<deployment-name>\"\nmodel_provider = \"apim\"\nfeatures = { plugins = false, remote_plugin = false, plugin_sharing = false, apps = false, in_app_updates = false }\nanalytics = { enabled = false }\n\n[model_providers.apim]\nname = \"Azure APIM\"\nbase_url = \"https://<apim-host>/<openai-responses-api-path>\"\nwire_api = \"responses\"\n# Only if the gateway needs them:\n# query_params = { api-version = \"<version>\" }\n# http_headers = { \"Ocp-Apim-Subscription-Key\" = \"<subscription-key>\" }\n\n[model_providers.apim.auth]\ncommand = \"powershell\"\nargs = [\"-NoProfile\", \"-File\", 'C:\\Users\\<you>\\bin\\get-apim-token.ps1']\ntimeout_ms = 15000\nrefresh_interval_ms = 1800000"
+    },
+    {
+      "file": "VS Code settings.json (quieter VS Code)",
+      "format": "json",
+      "content": "{\n  \"telemetry.telemetryLevel\": \"off\",\n  \"update.mode\": \"none\",\n  \"extensions.autoCheckUpdates\": false,\n  \"extensions.autoUpdate\": false,\n  \"workbench.enableExperiments\": false\n}"
+    },
+    {
+      "file": "get-apim-token.ps1",
+      "format": "powershell",
+      "content": "# Prints ONLY the raw JWT to stdout; on any problem prints a one-line reason to stderr and exits 1.\n# Failing fast matters: both Claude Code and Codex retry hard on a bad token.\n$Scope       = 'api://<apim-app-id>/.default'\n$ExpectedAud = @('api://<apim-app-id>', '<apim-app-client-id>')   # accept both token forms\n$MinLifeSecs = 60\n\n$lines = & az account get-access-token --scope $Scope --query accessToken -o tsv 2>$null\nif ($LASTEXITCODE -ne 0) { [Console]::Error.WriteLine(\"get-apim-token: az failed (exit $LASTEXITCODE). Run: az login\"); exit 1 }\n\n# Tolerate banners/warnings on stdout: keep only the line that looks like a JWT.\n$jwt = $lines | ForEach-Object { \"$_\".Trim() } | Where-Object { $_ -match '^eyJ[\\w-]+\\.[\\w-]+\\.[\\w-]+$' } | Select-Object -Last 1\nif (-not $jwt) { [Console]::Error.WriteLine('get-apim-token: az output contained no JWT'); exit 1 }\n\n# Sanity-check the claims so a wrong audience or nearly-expired token fails here, not as an endless 401 loop.\n$p = $jwt.Split('.')[1].Replace('-', '+').Replace('_', '/')\nwhile ($p.Length % 4) { $p += '=' }\n$claims = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($p)) | ConvertFrom-Json\n$now = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()\nif ($ExpectedAud -notcontains $claims.aud) { [Console]::Error.WriteLine(\"get-apim-token: token aud is '$($claims.aud)', expected '$($ExpectedAud -join \"' or '\")'\"); exit 1 }\nif ($claims.exp - $now -lt $MinLifeSecs) { [Console]::Error.WriteLine(\"get-apim-token: token expires in $($claims.exp - $now)s\"); exit 1 }\n\n[Console]::Out.Write($jwt)"
+    }
+  ],
+  "hosts_default": [
+    "chatgpt.com",
+    "chat.openai.com",
+    "ab.chatgpt.com",
+    "github.com",
+    "api.github.com",
+    "o33249.ingest.us.sentry.io",
+    "main.vscode-cdn.net",
+    "marketplace.visualstudio.com",
+    "www.vscode-unpkg.net"
+  ],
+  "hosts_after_config": [
+    "chatgpt.com",
+    "o33249.ingest.us.sentry.io",
+    "main.vscode-cdn.net",
+    "one unnamed Microsoft address"
+  ],
+  "limits": [
+    "Plugins, apps and connectors are unavailable; anonymous usage data from the bundled process is off.",
+    "The extension still attempts calls to OpenAI hosts and its error reporter; not configurable, harmless when blocked.",
+    "A 'Finish Windows setup' sandbox prompt and a model-promotion dialog can appear; unrelated to authentication.",
+    "With CODEX_HOME unset, caches and logs are written under %USERPROFILE%\\.codex.",
+    "The panel can need about 35 seconds before it accepts input.",
+    "The extension's own settings documentation page was not available.",
+    "Only the Responses wire format is supported for a custom provider.",
+    "Model metadata for deployment names is not discovered when the /models shape differs from {\"models\": [...]}, so generic metadata is used.",
+    "Hosted tools (web search, MCP, apps) are not governed by the sandbox network settings."
+  ],
+  "verification_status": "verified: shared config.toml, command-backed authentication without a ChatGPT sign-in, panel reply, network behaviour. Default config location (CODEX_HOME unset) and reload after config edits not verified.",
+  "references": [
+    "https://developers.openai.com/codex/ide",
+    "https://developers.openai.com/codex/config-advanced",
+    "https://learn.chatgpt.com/docs/config-file/config-reference",
+    "https://learn.chatgpt.com/docs/config-file/config-basic"
+  ],
+  "self_contained": true
+}

@@ -1,0 +1,52 @@
+{
+  "wait_ms": 22000,
+  "keepProfile": true,
+  "scenario": "j4-byok-ui-added",
+  "probe": false,
+  "steps": [
+    {
+      "y": 818,
+      "do": "click_xy",
+      "x": 1268
+    },
+    {
+      "do": "wait",
+      "ms": 2000
+    },
+    {
+      "y": 786,
+      "do": "click_xy",
+      "x": 1070
+    },
+    {
+      "do": "wait",
+      "ms": 2000
+    },
+    {
+      "y": 782,
+      "do": "click_xy",
+      "x": 1250
+    },
+    {
+      "do": "type",
+      "text": "Reply with the single word: ok"
+    },
+    {
+      "key": "Enter",
+      "do": "press"
+    },
+    {
+      "do": "wait",
+      "ms": 25000
+    },
+    {
+      "do": "shot",
+      "name": "byok-sent"
+    },
+    {
+      "do": "text"
+    }
+  ],
+  "pathPrepend": "C:\\Users\\USER\\Local\\apim-harness-test\\fakeaz",
+  "extDir": "C:\\Users\\USER\\Local\\apim-harness-test\\vscode-ext-none"
+}

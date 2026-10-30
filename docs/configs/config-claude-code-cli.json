@@ -1,0 +1,227 @@
+{
+  "id": "claude-code-cli",
+  "harness": "Claude Code CLI",
+  "product_versions": [
+    "2.1.311"
+  ],
+  "os": [
+    "windows"
+  ],
+  "config_locations": [
+    "%USERPROFILE%\\.claude\\settings.json (user)",
+    ".claude\\settings.json (project, committed)",
+    ".claude\\settings.local.json (project local)",
+    "managed-settings.json (managed)",
+    "CLAUDE_CONFIG_DIR relocates the user folder"
+  ],
+  "supports_byok": true,
+  "requires_parent_login_for_byok": false,
+  "can_disable_login_prompt": true,
+  "can_disable_login_prompt_note": "apiKeyHelper is a credential source; no claude.ai or Anthropic sign-in prompt appears. DISABLE_LOGIN_COMMAND hides /login (command switch only). --bare stops reading OAuth and keychain credentials.",
+  "telemetry_controls": [
+    {
+      "setting": "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC",
+      "where": "env in settings.json",
+      "value": "1",
+      "default": "unset",
+      "effect": "Umbrella: auto-updates, telemetry, error reporting, /feedback and drafted feedback, release notes, PR/MR status checks, availability checks (fast mode), feature-flag fetching, surveys. Does not cover the WebFetch domain check, official marketplace auto-install, or gateway model discovery.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "DISABLE_TELEMETRY",
+      "where": "env",
+      "value": "1",
+      "default": "on for the Claude API",
+      "effect": "Opts out of operational metrics (Datadog log intake), feature-flag fetching and surveys. Does not disable /feedback.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "DO_NOT_TRACK",
+      "where": "env",
+      "value": "1",
+      "default": "unset",
+      "effect": "Same effect as DISABLE_TELEMETRY. A value of 0 leaves telemetry on.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "DISABLE_ERROR_REPORTING",
+      "where": "env",
+      "value": "1",
+      "default": "on for Pro and Max sign-ins on 2.1.198+, otherwise off",
+      "effect": "Opts out of error reports (Datadog browser intake). Does not affect feature flags.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "DISABLE_AUTOUPDATER",
+      "where": "env",
+      "value": "1",
+      "default": "updates on",
+      "effect": "Stops automatic background updates. Manual `claude update` still works.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "DISABLE_UPDATES",
+      "where": "env",
+      "value": "1",
+      "default": "off",
+      "effect": "Blocks all updates including manual `claude update` and `claude install`.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "DISABLE_FEEDBACK_COMMAND",
+      "where": "env",
+      "value": "1",
+      "default": "unset",
+      "effect": "Disables /feedback, /bug, /share and Claude-drafted feedback.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY",
+      "where": "env",
+      "value": "1",
+      "default": "unset",
+      "effect": "Disables the session survey only.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "DISABLE_GROWTHBOOK",
+      "where": "env",
+      "value": "1",
+      "default": "unset",
+      "effect": "Stops feature-flag fetching. Telemetry events stay on unless DISABLE_TELEMETRY is also set.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "ENABLE_CLAUDEAI_MCP_SERVERS",
+      "where": "env",
+      "value": "false",
+      "default": "on for signed-in users",
+      "effect": "Stops fetching claude.ai MCP servers (mcp-proxy.anthropic.com).",
+      "evidence": "documented"
+    },
+    {
+      "setting": "disableClaudeAiConnectors",
+      "where": "settings",
+      "value": "true",
+      "default": "false",
+      "effect": "Turns off claude.ai connectors.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "skipWebFetchPreflight",
+      "where": "settings",
+      "value": "true",
+      "default": "check on",
+      "effect": "Skips the WebFetch hostname check sent to api.anthropic.com. Documentation is inconsistent about the exact scope.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "CLAUDE_CODE_DISABLE_WEB_FETCH",
+      "where": "env",
+      "value": "1",
+      "default": "off",
+      "effect": "Turns off the WebFetch tool (2.1.285+). WebSearch stays; no switch to disable WebSearch is documented.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "CLAUDE_CODE_DISABLE_OFFICIAL_MARKETPLACE_AUTOINSTALL",
+      "where": "env",
+      "value": "1",
+      "default": "unset",
+      "effect": "Skips automatic registration of the official plugin marketplace; read at first interactive launch.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "disableRemoteControl",
+      "where": "settings",
+      "value": "true",
+      "default": "false",
+      "effect": "Refuses Remote Control.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "syncClaudeAiSkills / syncClaudeAiPlugins",
+      "where": "settings (user, local, managed)",
+      "value": "false",
+      "default": "sync on for claude.ai sign-ins",
+      "effect": "Stops downloading claude.ai skills and plugins.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "allowedProviders",
+      "where": "managed settings",
+      "value": "[\"customEndpoint\"]",
+      "default": "unset",
+      "effect": "Refuses sessions pointed anywhere except the managed ANTHROPIC_BASE_URL (2.1.285+). Documented, effect not confirmed.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "CLAUDE_CODE_ENABLE_TELEMETRY",
+      "where": "env",
+      "value": "unset",
+      "default": "off",
+      "effect": "OpenTelemetry export to your own collector is opt-in; OTEL_*_EXPORTER accept none.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC + DISABLE_TELEMETRY + DISABLE_ERROR_REPORTING + DISABLE_AUTOUPDATER",
+      "where": "env",
+      "value": "all 1",
+      "default": "unset",
+      "effect": "With all four set no connection to a host outside the gateway was opened during a prompt.",
+      "evidence": "observed"
+    }
+  ],
+  "auth": {
+    "method": "apiKeyHelper command in settings.json; value sent in both Authorization: Bearer and x-api-key",
+    "native_helper_command": true,
+    "static_key_supported": true,
+    "custom_headers_supported": true,
+    "notes": "Output cached 5 minutes by default (CLAUDE_CODE_API_KEY_HELPER_TTL_MS). A 401 on an expired token re-runs the helper and retries. ANTHROPIC_AUTH_TOKEN and ANTHROPIC_API_KEY take precedence over apiKeyHelper and must not be set. Custom headers via ANTHROPIC_CUSTOM_HEADERS (2.1.227+). A helper that prints anything besides the credential fails (2.1.227+).",
+    "helper_script": "Included in config_snippets as get-apim-token.ps1; prints only the Entra access token for the gateway API, fails fast on wrong audience, expired token or az error."
+  },
+  "api_formats": [
+    "anthropic-messages (POST <base>/v1/messages?beta=true, SSE streaming)"
+  ],
+  "model_discovery_endpoint_behaviour": "Off by default. CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY=1 calls GET <base>/v1/models?limit=1000 (3 s timeout) and keeps only IDs containing 'claude' or 'anthropic'. A best-effort HEAD <base>/api/hello is sent at startup.",
+  "config_snippets": [
+    {
+      "file": "%USERPROFILE%\\.claude\\settings.json",
+      "format": "json",
+      "content": "{\n  \"apiKeyHelper\": \"powershell -NoProfile -File C:\\\\Users\\\\<you>\\\\bin\\\\get-apim-token.ps1\",\n  \"env\": {\n    \"ANTHROPIC_BASE_URL\": \"https://<apim-host>/<anthropic-api-path>\",\n    \"CLAUDE_CODE_API_KEY_HELPER_TTL_MS\": \"1800000\",\n    \"ANTHROPIC_DEFAULT_OPUS_MODEL\": \"<deployment-name>\",\n    \"ANTHROPIC_DEFAULT_SONNET_MODEL\": \"<deployment-name>\",\n    \"ANTHROPIC_DEFAULT_HAIKU_MODEL\": \"<deployment-name>\",\n    \"CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC\": \"1\",\n    \"DISABLE_TELEMETRY\": \"1\",\n    \"DISABLE_ERROR_REPORTING\": \"1\",\n    \"DISABLE_AUTOUPDATER\": \"1\"\n  }\n}"
+    },
+    {
+      "file": "%USERPROFILE%\\.claude\\settings.json (optional extra headers)",
+      "format": "json",
+      "content": "{\n  \"env\": {\n    \"ANTHROPIC_CUSTOM_HEADERS\": \"Ocp-Apim-Subscription-Key: <subscription-key>\"\n  }\n}"
+    },
+    {
+      "file": "C:\\Users\\<you>\\bin\\get-apim-token.ps1",
+      "format": "powershell",
+      "content": "# Prints ONLY the raw JWT to stdout; on any problem prints a one-line reason to stderr and exits 1.\n# Failing fast matters: both Claude Code and Codex retry hard on a bad token.\n$Scope       = 'api://<apim-app-id>/.default'\n$ExpectedAud = @('api://<apim-app-id>', '<apim-app-client-id>')   # accept both token forms\n$MinLifeSecs = 60\n\n$lines = & az account get-access-token --scope $Scope --query accessToken -o tsv 2>$null\nif ($LASTEXITCODE -ne 0) { [Console]::Error.WriteLine(\"get-apim-token: az failed (exit $LASTEXITCODE). Run: az login\"); exit 1 }\n\n# Tolerate banners/warnings on stdout: keep only the line that looks like a JWT.\n$jwt = $lines | ForEach-Object { \"$_\".Trim() } | Where-Object { $_ -match '^eyJ[\\w-]+\\.[\\w-]+\\.[\\w-]+$' } | Select-Object -Last 1\nif (-not $jwt) { [Console]::Error.WriteLine('get-apim-token: az output contained no JWT'); exit 1 }\n\n# Sanity-check the claims so a wrong audience or nearly-expired token fails here, not as an endless 401 loop.\n$p = $jwt.Split('.')[1].Replace('-', '+').Replace('_', '/')\nwhile ($p.Length % 4) { $p += '=' }\n$claims = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($p)) | ConvertFrom-Json\n$now = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()\nif ($ExpectedAud -notcontains $claims.aud) { [Console]::Error.WriteLine(\"get-apim-token: token aud is '$($claims.aud)', expected '$($ExpectedAud -join \"' or '\")'\"); exit 1 }\nif ($claims.exp - $now -lt $MinLifeSecs) { [Console]::Error.WriteLine(\"get-apim-token: token expires in $($claims.exp - $now)s\"); exit 1 }\n\n[Console]::Out.Write($jwt)"
+    }
+  ],
+  "hosts_default": [
+    "api.anthropic.com"
+  ],
+  "hosts_after_config": [],
+  "limits": [
+    "With feature-flag fetching off these are unavailable: Remote Control, claude import, /skill-doctor, claude.ai skill and plugin sync, advisor tool, MCP tasks, artifact comments, default PowerShell tool on Windows with Git Bash, Claude-drafted feedback, idle compaction.",
+    "No /feedback and no automatic updates; update manually.",
+    "Model names, context windows and capabilities for custom deployment names are not discovered; unrecognised IDs assume a 200K context window.",
+    "Remote Control is disabled when the base URL host differs from api.anthropic.com.",
+    "WebSearch behaviour behind a custom base URL is not documented."
+  ],
+  "verification_status": "verified: helper authentication, model-name configuration, custom headers, refresh and failure behaviour, four-variable network switch set. Not verified against a production gateway.",
+  "references": [
+    "https://code.claude.com/docs/en/authentication",
+    "https://code.claude.com/docs/en/llm-gateway-connect",
+    "https://code.claude.com/docs/en/llm-gateway-protocol",
+    "https://code.claude.com/docs/en/env-vars",
+    "https://code.claude.com/docs/en/settings",
+    "https://code.claude.com/docs/en/data-usage",
+    "https://code.claude.com/docs/en/network-config",
+    "https://code.claude.com/docs/en/model-config"
+  ],
+  "self_contained": true
+}

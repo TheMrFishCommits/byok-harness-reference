@@ -1,0 +1,45 @@
+{
+  "modelsJson": "../vscode-cfg/via_proxy_responses.json",
+  "wait_ms": 14000,
+  "scenario": "d13-claude-ext-send",
+  "env": {
+    "CLAUDE_CONFIG_DIR": "C:\\Users\\USER\\Local\\apim-harness-test\\work\\claude-vsext"
+  },
+  "pathPrepend": "C:\\Users\\USER\\Local\\apim-harness-test\\fakeaz",
+  "steps": [
+    {
+      "do": "click_xy",
+      "x": 1355,
+      "y": 884
+    },
+    {
+      "ms": 15000,
+      "do": "wait"
+    },
+    {
+      "do": "click_xy",
+      "x": 745,
+      "y": 794
+    },
+    {
+      "key": "Control+a",
+      "do": "press"
+    },
+    {
+      "text": "Reply with the single word: ok",
+      "do": "type"
+    },
+    {
+      "key": "Enter",
+      "do": "press"
+    },
+    {
+      "ms": 25000,
+      "do": "wait"
+    },
+    {
+      "name": "claude-after-send",
+      "do": "shot"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "steps": [
+    {
+      "y": 851,
+      "x": 1190,
+      "do": "click_xy"
+    },
+    {
+      "do": "wait",
+      "ms": 2000
+    },
+    {
+      "do": "shot",
+      "name": "session-types"
+    }
+  ],
+  "scenario": "d14-byok-claude-harness",
+  "modelsJson": "../vscode-cfg/via_proxy_messages.json",
+  "pathPrepend": "C:\\Users\\USER\\Local\\apim-harness-test\\fakeaz",
+  "wait_ms": 16000
+}

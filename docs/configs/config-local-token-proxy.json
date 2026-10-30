@@ -1,0 +1,74 @@
+{
+  "id": "local-token-proxy",
+  "harness": "Local token proxy (proxy.py)",
+  "product_versions": [
+    "Python 3.9 or later",
+    "aiohttp"
+  ],
+  "os": [
+    "windows (helper is PowerShell); proxy is portable"
+  ],
+  "config_locations": [
+    "command-line arguments only"
+  ],
+  "supports_byok": null,
+  "requires_parent_login_for_byok": null,
+  "can_disable_login_prompt": true,
+  "can_disable_login_prompt_note": "The proxy has no login, telemetry or update check; the client uses its static-key path.",
+  "telemetry_controls": [
+    {
+      "setting": "telemetry / update check / logging",
+      "where": "proxy",
+      "value": "none exist",
+      "default": "n/a",
+      "effect": "The proxy has no telemetry, update check or request logging; it prints nothing and never logs tokens.",
+      "evidence": "documented"
+    }
+  ],
+  "auth": {
+    "method": "Replaces Authorization, x-api-key and api-key from the client with Authorization: Bearer <jwt> obtained from a helper command (30 s limit); token reused until within --margin-s (default 300) of expiry; one forced refresh and retry on upstream 401; HTTP 502 with the helper's message when the helper fails",
+    "native_helper_command": true,
+    "static_key_supported": true,
+    "custom_headers_supported": true,
+    "notes": "Optional --local-key requires clients to send that key (x-api-key, api-key or bearer). Binds 127.0.0.1 only (fixed in source). GET /_proxy/health returns {\"ok\": true, \"token_fetches\": n}. Streams SSE; passes content encoding through; redirects not followed; request body limit 64 MB. Any local process that can reach the port uses the user's token."
+  },
+  "api_formats": [
+    "any HTTP API; request path and query are appended to --upstream"
+  ],
+  "model_discovery_endpoint_behaviour": "not applicable (requests are forwarded unchanged apart from authentication headers)",
+  "config_snippets": [
+    {
+      "file": "command line",
+      "format": "powershell",
+      "content": "python proxy.py --upstream https://<apim-host> --port 18081 --margin-s 300 -- powershell -NoProfile -File C:\\Users\\<you>\\bin\\get-apim-token.ps1"
+    },
+    {
+      "file": "get-apim-token.ps1",
+      "format": "powershell",
+      "content": "# Prints ONLY the raw JWT to stdout; on any problem prints a one-line reason to stderr and exits 1.\n# Failing fast matters: both Claude Code and Codex retry hard on a bad token.\n$Scope       = 'api://<apim-app-id>/.default'\n$ExpectedAud = @('api://<apim-app-id>', '<apim-app-client-id>')   # accept both token forms\n$MinLifeSecs = 60\n\n$lines = & az account get-access-token --scope $Scope --query accessToken -o tsv 2>$null\nif ($LASTEXITCODE -ne 0) { [Console]::Error.WriteLine(\"get-apim-token: az failed (exit $LASTEXITCODE). Run: az login\"); exit 1 }\n\n# Tolerate banners/warnings on stdout: keep only the line that looks like a JWT.\n$jwt = $lines | ForEach-Object { \"$_\".Trim() } | Where-Object { $_ -match '^eyJ[\\w-]+\\.[\\w-]+\\.[\\w-]+$' } | Select-Object -Last 1\nif (-not $jwt) { [Console]::Error.WriteLine('get-apim-token: az output contained no JWT'); exit 1 }\n\n# Sanity-check the claims so a wrong audience or nearly-expired token fails here, not as an endless 401 loop.\n$p = $jwt.Split('.')[1].Replace('-', '+').Replace('_', '/')\nwhile ($p.Length % 4) { $p += '=' }\n$claims = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($p)) | ConvertFrom-Json\n$now = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()\nif ($ExpectedAud -notcontains $claims.aud) { [Console]::Error.WriteLine(\"get-apim-token: token aud is '$($claims.aud)', expected '$($ExpectedAud -join \"' or '\")'\"); exit 1 }\nif ($claims.exp - $now -lt $MinLifeSecs) { [Console]::Error.WriteLine(\"get-apim-token: token expires in $($claims.exp - $now)s\"); exit 1 }\n\n[Console]::Out.Write($jwt)"
+    }
+  ],
+  "hosts_default": [
+    "the --upstream host",
+    "Entra endpoints through the helper when a token is needed"
+  ],
+  "hosts_after_config": [
+    "the --upstream host",
+    "Entra endpoints through the helper when a token is needed"
+  ],
+  "limits": [
+    "Any process that can reach 127.0.0.1 on the port can use the user's token; shared hosts share the loopback interface.",
+    "The gateway cannot distinguish clients; one token for all.",
+    "The client must accept a dummy key.",
+    "HTTP to the proxy is plain text on loopback only.",
+    "HTTPS to a real gateway through the proxy and the --local-key option have no run-time confirmation yet."
+  ],
+  "verification_status": "verified: key replacement, SSE pass-through, retry on upstream 401, 502 on helper failure and recovery, use by Claude Code, Codex, Copilot CLI and VS Code Copilot Chat. Not verified: HTTPS upstream, --local-key, JetBrains.",
+  "references": [
+    "https://docs.aiohttp.org/",
+    "https://learn.microsoft.com/en-us/azure/api-management/validate-jwt-policy",
+    "https://code.visualstudio.com/docs/agent-customization/language-models",
+    "https://docs.github.com/copilot/how-tos/copilot-cli/customize-copilot/use-byok-models"
+  ],
+  "self_contained": true
+}

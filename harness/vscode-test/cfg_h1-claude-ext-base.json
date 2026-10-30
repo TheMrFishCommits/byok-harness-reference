@@ -1,0 +1,46 @@
+{
+  "steps": [
+    {
+      "x": 1355,
+      "y": 884,
+      "do": "click_xy"
+    },
+    {
+      "do": "wait",
+      "ms": 15000
+    },
+    {
+      "x": 745,
+      "y": 794,
+      "do": "click_xy"
+    },
+    {
+      "do": "press",
+      "key": "Control+a"
+    },
+    {
+      "do": "type",
+      "text": "Reply with the single word: ok"
+    },
+    {
+      "do": "press",
+      "key": "Enter"
+    },
+    {
+      "do": "wait",
+      "ms": 25000
+    }
+  ],
+  "modelsJson": "../vscode-cfg/via_proxy_responses.json",
+  "args": [
+    "--log-net-log={base}\\netlog.json"
+  ],
+  "extDir": "C:\\Users\\USER\\Local\\apim-harness-test\\vscode-ext-claude",
+  "pathPrepend": "C:\\Users\\USER\\Local\\apim-harness-test\\fakeaz",
+  "env": {
+    "CLAUDE_CONFIG_DIR": "C:\\Users\\USER\\Local\\apim-harness-test\\work\\claude-vsext"
+  },
+  "probe": false,
+  "wait_ms": 14000,
+  "scenario": "h1-claude-ext-base"
+}

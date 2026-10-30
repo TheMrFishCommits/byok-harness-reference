@@ -1,0 +1,50 @@
+{
+  "wait_ms": 12000,
+  "scenario": "d11-codex-ext-send",
+  "steps": [
+    {
+      "y": 851,
+      "do": "click_xy",
+      "x": 1190
+    },
+    {
+      "do": "wait",
+      "ms": 1500
+    },
+    {
+      "y": 767,
+      "do": "click_xy",
+      "x": 1208
+    },
+    {
+      "do": "wait",
+      "ms": 36000
+    },
+    {
+      "y": 785,
+      "do": "click_xy",
+      "x": 745
+    },
+    {
+      "do": "type",
+      "text": "Reply with the single word: ok"
+    },
+    {
+      "key": "Enter",
+      "do": "press"
+    },
+    {
+      "do": "wait",
+      "ms": 25000
+    },
+    {
+      "do": "shot",
+      "name": "codex-after-send"
+    }
+  ],
+  "env": {
+    "CODEX_HOME": "C:\\Users\\USER\\Local\\apim-harness-test\\work\\codex-vsext"
+  },
+  "modelsJson": "../vscode-cfg/via_proxy_responses.json",
+  "pathPrepend": "C:\\Users\\USER\\Local\\apim-harness-test\\fakeaz"
+}

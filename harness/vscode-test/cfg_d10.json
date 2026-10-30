@@ -1,0 +1,36 @@
+{
+  "wait_ms": 12000,
+  "modelsJson": "../vscode-cfg/via_proxy_responses.json",
+  "pathPrepend": "C:\\Users\\USER\\Local\\apim-harness-test\\fakeaz",
+  "steps": [
+    {
+      "x": 1190,
+      "do": "click_xy",
+      "y": 851
+    },
+    {
+      "ms": 1500,
+      "do": "wait"
+    },
+    {
+      "x": 1208,
+      "do": "click_xy",
+      "y": 767
+    },
+    {
+      "ms": 35000,
+      "do": "wait"
+    },
+    {
+      "do": "shot",
+      "name": "codex-35s"
+    },
+    {
+      "do": "frames"
+    }
+  ],
+  "scenario": "d10-codex-ext-long",
+  "env": {
+    "CODEX_HOME": "C:\\Users\\USER\\Local\\apim-harness-test\\work\\codex-vsext"
+  }
+}

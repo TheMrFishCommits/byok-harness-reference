@@ -1,0 +1,12 @@
+{
+  "scenario": "d05-picker",
+  "modelsJson": "../vscode-cfg/via_proxy_responses.json",
+  "wait_ms": 15000,
+  "steps": [
+    {"do": "press", "key": "Control+Alt+i"},
+    {"do": "wait", "ms": 2500},
+    {"do": "click_xy", "x": 1271, "y": 818},
+    {"do": "wait", "ms": 2000},
+    {"do": "shot", "name": "picker"}
+  ]
+}

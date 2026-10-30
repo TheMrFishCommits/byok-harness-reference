@@ -1,0 +1,164 @@
+{
+  "id": "config-jetbrains-ai-assistant",
+  "harness": "JetBrains AI Assistant (OpenAI-compatible third-party provider)",
+  "product_versions": [
+    "AI Assistant plugin com.intellij.ml.llm (documentation 2026.2)",
+    "PyCharm 2026.2.3 (PY-262.10968.92)"
+  ],
+  "os": [
+    "Windows 11"
+  ],
+  "config_locations": [
+    {
+      "path": "Settings > Tools > AI Assistant > Providers & API keys > Third-party AI providers (Beta)",
+      "scope": "IDE settings UI",
+      "storage_location": "not documented",
+      "evidence": "observed"
+    }
+  ],
+  "provider_dropdown_options": [
+    "None",
+    "Gemini API key",
+    "Google Vertex AI",
+    "Anthropic",
+    "OpenAI-compatible",
+    "OpenAI",
+    "LM Studio",
+    "Ollama"
+  ],
+  "openai_compatible_fields": [
+    "URL",
+    "API Key (masked)",
+    "HTTP version radio (HTTP/2 default, HTTP/1.1)",
+    "Test Connection",
+    "Tool calling checkbox (on by default)"
+  ],
+  "supports_byok": true,
+  "requires_parent_login_for_byok": {
+    "value": false,
+    "note": "The OpenAI-compatible provider works without a JetBrains account or JetBrains AI subscription. Activate JetBrains AI and Start Free Trial are optional.",
+    "evidence": "observed"
+  },
+  "can_disable_login_prompt": {
+    "value": true,
+    "how": "No sign-in is needed for the OpenAI-compatible provider; skip Activate JetBrains AI. First start shows a User Agreement and a Data Sharing dialog (choose Don't Send). Choosing a third-party provider shows a Data Sharing with Third-Party AI Service Providers confirmation, which may appear more than once.",
+    "evidence": "observed"
+  },
+  "telemetry_controls": [
+    {
+      "setting": "Data Sharing",
+      "where": "first-start dialog, or Settings > Appearance & Behavior > System Settings > Data Sharing",
+      "value": "Don't Send",
+      "default": "asked at first start",
+      "effect": "Declines anonymous usage statistics; applies to all installed JetBrains products",
+      "evidence": "observed"
+    },
+    {
+      "setting": "Data Sharing with Third-Party AI Service Providers",
+      "where": "confirmation shown when a third-party provider is chosen",
+      "value": "confirm",
+      "default": "asked when provider is chosen",
+      "effect": "Confirms data may be sent to the hosts in the provider settings; JetBrains disclaims responsibility; may appear more than once",
+      "evidence": "observed"
+    },
+    {
+      "setting": "Activate JetBrains AI",
+      "where": "optional step in custom-models setup",
+      "value": "skip",
+      "default": "not activated",
+      "effect": "Optional; activating it alongside BYOK lets JetBrains AI cover features custom models do not support",
+      "evidence": "documented"
+    },
+    {
+      "setting": "AI Assistant telemetry, error reporting, offline mode",
+      "where": "none",
+      "value": "none documented",
+      "default": "n/a",
+      "effect": "No setting documented for the provider",
+      "evidence": "documented"
+    }
+  ],
+  "auth": {
+    "method": "local token proxy (placeholder API key)",
+    "native_helper_command": false,
+    "native_helper_command_evidence": "observed (no such field in the provider form)",
+    "static_key_supported": true,
+    "custom_headers_supported": false,
+    "header_sent": "Authorization: Bearer <API key>; no x-api-key",
+    "user_agent": "ktor-client",
+    "notes": "The form has no custom header setting and no token command. Point the provider URL at the local token proxy (Appendix B of the guide); the API key field can hold any non-empty value because the proxy replaces it with a fresh JWT; the helper command that supplies the token is Appendix A of the guide. With a plain-HTTP proxy that speaks HTTP/1.1, select HTTP/1.1 (HTTP/2 cleartext was not tried).",
+    "evidence": "observed"
+  },
+  "api_formats": [
+    "chat-completions"
+  ],
+  "api_format_notes": "Chat uses the OpenAI Chat Completions API with stream true and Accept application/json,text/event-stream. The Responses API was not used in the chat path.",
+  "url_rule": "The plugin appends only the endpoint name to the URL entered and does not add /v1. URL http://<host>/<prefix> gives GET <url>/models; URL http://<host>/<prefix>/v1 gives GET <url>/models and POST <url>/chat/completions (.../v1/models, .../v1/chat/completions). The URL must include /v1 or whatever prefix the gateway uses.",
+  "model_discovery_endpoint_behaviour": "GET <url>/models, expecting the OpenAI list shape {\"object\":\"list\",\"data\":[{\"id\":\"<model-id>\"}]}. Test Connection issues it twice. The Model Assignment dropdowns list the models returned by this call, shown as OpenAIAPI/<model-id>.",
+  "model_assignment_required": true,
+  "model_assignment_notes": "After Test Connection reports Connected, chat answers 'No compatible model is available for Chat mode' until Core features and Instant helpers are set under Model Assignment to a model from the gateway list.",
+  "requests_per_prompt_observed": "~12",
+  "requests_per_prompt_notes": "One chat prompt produced about 12 POSTs to <url>/chat/completions: one chat call with 35 tool definitions and about eleven background helper calls without tools (titles, summaries).",
+  "config_snippets": [
+    {
+      "file": "IDE settings UI (not a file)",
+      "format": "text",
+      "content": "Settings > Tools > AI Assistant > Providers & API keys > Third-party AI providers (Beta) > OpenAI-compatible\nURL: http://127.0.0.1:<proxy-port>/<apim-api-path>/v1\nAPI Key: <any-non-empty-placeholder>\nHTTP version: HTTP/1.1 for a plain-HTTP proxy that speaks HTTP/1.1 (HTTP/2 is the default)\nTool calling: leave ticked if the model supports it\nThen: Test Connection (reports Connected), and under Model Assignment set Core features and Instant helpers to the listed model"
+    },
+    {
+      "file": "get-apim-token.ps1",
+      "format": "powershell",
+      "content": "# Prints ONLY the raw JWT to stdout; on any problem prints a one-line reason to stderr and exits 1.\n# Failing fast matters: both Claude Code and Codex retry hard on a bad token.\n$Scope       = 'api://<apim-app-id>/.default'\n$ExpectedAud = @('api://<apim-app-id>', '<apim-app-client-id>')   # accept both token forms\n$MinLifeSecs = 60\n\n$lines = & az account get-access-token --scope $Scope --query accessToken -o tsv 2>$null\nif ($LASTEXITCODE -ne 0) { [Console]::Error.WriteLine(\"get-apim-token: az failed (exit $LASTEXITCODE). Run: az login\"); exit 1 }\n\n# Tolerate banners/warnings on stdout: keep only the line that looks like a JWT.\n$jwt = $lines | ForEach-Object { \"$_\".Trim() } | Where-Object { $_ -match '^eyJ[\\w-]+\\.[\\w-]+\\.[\\w-]+$' } | Select-Object -Last 1\nif (-not $jwt) { [Console]::Error.WriteLine('get-apim-token: az output contained no JWT'); exit 1 }\n\n# Sanity-check the claims so a wrong audience or nearly-expired token fails here, not as an endless 401 loop.\n$p = $jwt.Split('.')[1].Replace('-', '+').Replace('_', '/')\nwhile ($p.Length % 4) { $p += '=' }\n$claims = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($p)) | ConvertFrom-Json\n$now = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()\nif ($ExpectedAud -notcontains $claims.aud) { [Console]::Error.WriteLine(\"get-apim-token: token aud is '$($claims.aud)', expected '$($ExpectedAud -join \"' or '\")'\"); exit 1 }\nif ($claims.exp - $now -lt $MinLifeSecs) { [Console]::Error.WriteLine(\"get-apim-token: token expires in $($claims.exp - $now)s\"); exit 1 }\n\n[Console]::Out.Write($jwt)"
+    },
+    {
+      "file": "proxy.py",
+      "format": "python",
+      "content": "\"\"\"Local token-injecting reverse proxy for tools that can only send a static key (VS Code Copilot BYOK, JetBrains, ...).\n\nClients send any dummy key to http://127.0.0.1:<port>; the proxy replaces Authorization with a fresh JWT obtained from a\nhelper command, streams the response back, and retries once on an upstream 401 with a forced token refresh.\n\nusage: proxy.py --upstream https://<apim>.azure-api.net [--port 18081] [--margin-s 300] [--local-key K] -- <helper cmd...>\n\"\"\"\nimport argparse\nimport asyncio\nimport base64\nimport json\nimport sys\nimport time\n\nfrom aiohttp import ClientSession, ClientTimeout, web\n\nHOP = {\"connection\", \"keep-alive\", \"proxy-authenticate\", \"proxy-authorization\", \"te\", \"trailers\",\n       \"transfer-encoding\", \"upgrade\", \"host\", \"content-length\"}\nDROP_IN = {\"authorization\", \"x-api-key\", \"api-key\"}\n\n\nclass TokenSource:\n    def __init__(self, cmd, margin):\n        self.cmd, self.margin, self.tok, self.exp, self.lock, self.fetches = cmd, margin, None, 0, asyncio.Lock(), 0\n\n    async def get(self, force=False):\n        async with self.lock:\n            if not force and self.tok and self.exp - time.time() > self.margin:\n                return self.tok\n            p = await asyncio.create_subprocess_exec(*self.cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)\n            out, err = await asyncio.wait_for(p.communicate(), 30)\n            if p.returncode != 0:\n                raise RuntimeError(err.decode(errors=\"replace\").strip() or f\"helper exited {p.returncode}\")\n            tok = out.decode().strip()\n            seg = tok.split(\".\")[1]\n            claims = json.loads(base64.urlsafe_b64decode(seg + \"=\" * (-len(seg) % 4)))\n            self.tok, self.exp, self.fetches = tok, claims[\"exp\"], self.fetches + 1\n            return tok\n\n\ndef make_app(upstream, tokens, local_key):\n    async def handler(request):\n        if request.path == \"/_proxy/health\":\n            return web.json_response({\"ok\": True, \"token_fetches\": tokens.fetches})\n        if local_key:\n            sent = request.headers.get(\"x-api-key\") or request.headers.get(\"api-key\") or \\\n                   request.headers.get(\"Authorization\", \"\").removeprefix(\"Bearer \").strip()\n            if sent != local_key:\n                return web.json_response({\"error\": \"bad local key\"}, status=401)\n        body = await request.read()\n        fwd = {k: v for k, v in request.headers.items() if k.lower() not in HOP | DROP_IN}\n        url = upstream.rstrip(\"/\") + request.path_qs\n        sess = request.app[\"sess\"]\n        for attempt in (0, 1):\n            try:\n                tok = await tokens.get(force=attempt == 1)\n            except Exception as e:  # noqa: BLE001\n                return web.json_response({\"error\": \"token helper failed\", \"detail\": str(e)}, status=502)\n            async with sess.request(request.method, url, data=body or None,\n                                    headers={**fwd, \"Authorization\": f\"Bearer {tok}\"}, allow_redirects=False) as up:\n                if up.status == 401 and attempt == 0:\n                    continue\n                resp = web.StreamResponse(status=up.status,\n                                          headers={k: v for k, v in up.headers.items() if k.lower() not in HOP})\n                await resp.prepare(request)\n                async for chunk in up.content.iter_any():\n                    await resp.write(chunk)\n                await resp.write_eof()\n                return resp\n\n    async def on_start(app):\n        app[\"sess\"] = ClientSession(auto_decompress=False, timeout=ClientTimeout(total=None, sock_connect=15))\n\n    async def on_stop(app):\n        await app[\"sess\"].close()\n\n    app = web.Application(client_max_size=64 * 1024 * 1024)\n    app.on_startup.append(on_start)\n    app.on_cleanup.append(on_stop)\n    app.router.add_route(\"*\", \"/{tail:.*}\", handler)\n    return app\n\n\ndef main():\n    ap = argparse.ArgumentParser()\n    ap.add_argument(\"--upstream\", required=True)\n    ap.add_argument(\"--port\", type=int, default=18081)\n    ap.add_argument(\"--margin-s\", type=int, default=300)\n    ap.add_argument(\"--local-key\")\n    ap.add_argument(\"helper\", nargs=argparse.REMAINDER)\n    a = ap.parse_args()\n    cmd = [x for x in a.helper if x != \"--\"]\n    web.run_app(make_app(a.upstream, TokenSource(cmd, a.margin_s), a.local_key), host=\"127.0.0.1\", port=a.port, print=lambda *_: None)\n\n\nif __name__ == \"__main__\":\n    sys.exit(main())"
+    }
+  ],
+  "hosts_default": [
+    {
+      "host": "<provider URL host>",
+      "purpose": "model endpoint",
+      "evidence": "observed"
+    },
+    {
+      "host": "none external",
+      "purpose": "idle IDE at the welcome screen with the plugin installed and no provider configured made no external connections; default JetBrains cloud behaviour with no provider was not measured further",
+      "evidence": "observed"
+    }
+  ],
+  "hosts_after_config": [
+    {
+      "host": "<provider URL host>",
+      "purpose": "model endpoint (the local token proxy)",
+      "evidence": "observed"
+    },
+    {
+      "host": "none external",
+      "purpose": "idle IDE and IDE during chat made no external connections; a local child process embeddings-server.exe starts",
+      "evidence": "observed"
+    }
+  ],
+  "limits": [
+    "About twelve model calls per chat prompt (one chat call with 35 tool definitions plus about eleven background calls without tools)",
+    "A model must be assigned under Model Assignment before chat works; OpenAI-compatible models are not assigned automatically",
+    "The gateway must serve the Chat Completions API with streaming and an OpenAI-shaped /models list; the Responses API is not used for chat",
+    "The URL must include /v1 or the gateway prefix; the plugin does not add it",
+    "No custom HTTP headers and no token command, so the token proxy is required for Entra tokens",
+    "HTTP/2 is the default; a plain-HTTP/1.1 proxy needs HTTP/1.1 selected; HTTP/2 cleartext not tried",
+    "Code completion uses JetBrains models unless the AI Completion section is configured separately",
+    "Agents cannot use local models; AI Assistant cannot call MCP tools with local models",
+    "BYOK usage is billed by the provider, not JetBrains AI credits",
+    "Administrators using IDE Services or JetBrains Central can set the provider or disable custom models"
+  ],
+  "verification_status": "verified-runtime",
+  "references": [
+    "https://www.jetbrains.com/help/ai-assistant/",
+    "https://www.jetbrains.com/help/ai-assistant/activation-scenarios.html",
+    "https://www.jetbrains.com/help/ai-assistant/bring-your-own-key-byok.html",
+    "https://www.jetbrains.com/help/ai-assistant/use-custom-models.html",
+    "https://www.jetbrains.com/help/ai-assistant/licensing-and-subscriptions.html"
+  ],
+  "self_contained": true
+}

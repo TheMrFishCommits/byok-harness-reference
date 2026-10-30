@@ -1,0 +1,57 @@
+{
+  "extDir": "C:\\Users\\USER\\Local\\apim-harness-test\\vscode-ext-claude",
+  "env": {
+    "CLAUDE_CONFIG_DIR": "C:\\Users\\USER\\Local\\apim-harness-test\\work\\claude-vsext",
+    "NO_PROXY": "127.0.0.1,localhost,::1",
+    "ALL_PROXY": "http://127.0.0.1:18090",
+    "HTTPS_PROXY": "http://127.0.0.1:18090",
+    "HTTP_PROXY": "http://127.0.0.1:18090"
+  },
+  "steps": [
+    {
+      "y": 884,
+      "x": 1355,
+      "do": "click_xy"
+    },
+    {
+      "ms": 15000,
+      "do": "wait"
+    },
+    {
+      "y": 794,
+      "x": 745,
+      "do": "click_xy"
+    },
+    {
+      "key": "Control+a",
+      "do": "press"
+    },
+    {
+      "text": "Reply with the single word: ok",
+      "do": "type"
+    },
+    {
+      "key": "Enter",
+      "do": "press"
+    },
+    {
+      "ms": 25000,
+      "do": "wait"
+    }
+  ],
+  "probe": false,
+  "wait_ms": 14000,
+  "scenario": "i1-claude-ext-denied",
+  "args": [
+    "--log-net-log={base}\\netlog.json",
+    "--proxy-server=http://127.0.0.1:18090",
+    "--proxy-bypass-list=127.0.0.1;localhost;<-loopback>"
+  ],
+  "settings": {
+    "telemetry.telemetryLevel": "off",
+    "http.proxy": "http://127.0.0.1:18090",
+    "http.proxySupport": "override"
+  },
+  "modelsJson": "../vscode-cfg/via_proxy_responses.json",
+  "pathPrepend": "C:\\Users\\USER\\Local\\apim-harness-test\\fakeaz"
+}

@@ -1,0 +1,16 @@
+{
+  "scenario": "d02-model-editor",
+  "modelsJson": "../vscode-cfg/via_proxy_responses.json",
+  "wait_ms": 15000,
+  "steps": [
+    {"do": "palette", "text": "Chat: Manage Language Models"},
+    {"do": "wait", "ms": 5000},
+    {"do": "shot", "name": "manage-models"},
+    {"do": "text"},
+    {"do": "press", "key": "Escape"},
+    {"do": "click_text", "text": "Auto"},
+    {"do": "wait", "ms": 2500},
+    {"do": "shot", "name": "picker"},
+    {"do": "text"}
+  ]
+}

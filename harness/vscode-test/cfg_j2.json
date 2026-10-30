@@ -1,0 +1,33 @@
+{
+  "probe": false,
+  "scenario": "j2-add-models-ui",
+  "pathPrepend": "C:\\Users\\USER\\Local\\apim-harness-test\\fakeaz",
+  "wait_ms": 16000,
+  "extDir": "C:\\Users\\USER\\Local\\apim-harness-test\\vscode-ext-none",
+  "steps": [
+    {
+      "text": "Chat: Manage Language Models",
+      "do": "palette"
+    },
+    {
+      "ms": 3000,
+      "do": "wait"
+    },
+    {
+      "y": 168,
+      "do": "click_xy",
+      "x": 1091
+    },
+    {
+      "ms": 2500,
+      "do": "wait"
+    },
+    {
+      "name": "add1",
+      "do": "shot"
+    },
+    {
+      "do": "text"
+    }
+  ]
+}

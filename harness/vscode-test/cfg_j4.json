@@ -1,0 +1,78 @@
+{
+  "wait_ms": 16000,
+  "extDir": "C:\\Users\\USER\\Local\\apim-harness-test\\vscode-ext-none",
+  "probe": false,
+  "steps": [
+    {
+      "text": "Chat: Manage Language Models",
+      "do": "palette"
+    },
+    {
+      "do": "wait",
+      "ms": 3000
+    },
+    {
+      "y": 168,
+      "x": 1091,
+      "do": "click_xy"
+    },
+    {
+      "do": "wait",
+      "ms": 1500
+    },
+    {
+      "y": 415,
+      "x": 1134,
+      "do": "click_xy"
+    },
+    {
+      "do": "wait",
+      "ms": 2500
+    },
+    {
+      "text": "APIM-UI",
+      "do": "type"
+    },
+    {
+      "do": "press",
+      "key": "Enter"
+    },
+    {
+      "do": "wait",
+      "ms": 2500
+    },
+    {
+      "text": "dummy-local-key",
+      "do": "type"
+    },
+    {
+      "do": "press",
+      "key": "Enter"
+    },
+    {
+      "do": "wait",
+      "ms": 3000
+    },
+    {
+      "do": "press",
+      "key": "ArrowDown"
+    },
+    {
+      "do": "press",
+      "key": "Enter"
+    },
+    {
+      "do": "wait",
+      "ms": 4000
+    },
+    {
+      "do": "shot",
+      "name": "after-type"
+    },
+    {
+      "do": "text"
+    }
+  ],
+  "pathPrepend": "C:\\Users\\USER\\Local\\apim-harness-test\\fakeaz",
+  "scenario": "j4-byok-ui-added"
+}

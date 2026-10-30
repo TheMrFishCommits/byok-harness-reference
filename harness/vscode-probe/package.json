@@ -1,0 +1,9 @@
+{
+  "name": "lm-probe",
+  "displayName": "LM Probe",
+  "version": "0.0.1",
+  "publisher": "local",
+  "engines": { "vscode": "^1.100.0" },
+  "activationEvents": ["onStartupFinished"],
+  "main": "./extension.js"
+}

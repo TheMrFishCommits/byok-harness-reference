@@ -1,0 +1,62 @@
+{
+  "extDir": "C:\\Users\\USER\\Local\\apim-harness-test\\vscode-ext-codex",
+  "env": {
+    "NO_PROXY": "127.0.0.1,localhost,::1",
+    "ALL_PROXY": "http://127.0.0.1:18090",
+    "CODEX_HOME": "C:\\Users\\USER\\Local\\apim-harness-test\\work\\codex-vsext",
+    "HTTPS_PROXY": "http://127.0.0.1:18090",
+    "HTTP_PROXY": "http://127.0.0.1:18090"
+  },
+  "steps": [
+    {
+      "y": 851,
+      "x": 1190,
+      "do": "click_xy"
+    },
+    {
+      "ms": 1500,
+      "do": "wait"
+    },
+    {
+      "y": 767,
+      "x": 1208,
+      "do": "click_xy"
+    },
+    {
+      "ms": 36000,
+      "do": "wait"
+    },
+    {
+      "y": 785,
+      "x": 745,
+      "do": "click_xy"
+    },
+    {
+      "text": "Reply with the single word: ok",
+      "do": "type"
+    },
+    {
+      "key": "Enter",
+      "do": "press"
+    },
+    {
+      "ms": 25000,
+      "do": "wait"
+    }
+  ],
+  "probe": false,
+  "wait_ms": 14000,
+  "scenario": "i3-codex-ext-denied",
+  "args": [
+    "--log-net-log={base}\\netlog.json",
+    "--proxy-server=http://127.0.0.1:18090",
+    "--proxy-bypass-list=127.0.0.1;localhost;<-loopback>"
+  ],
+  "settings": {
+    "telemetry.telemetryLevel": "off",
+    "http.proxy": "http://127.0.0.1:18090",
+    "http.proxySupport": "override"
+  },
+  "modelsJson": "../vscode-cfg/via_proxy_responses.json",
+  "pathPrepend": "C:\\Users\\USER\\Local\\apim-harness-test\\fakeaz"
+}

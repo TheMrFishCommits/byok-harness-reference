@@ -1,0 +1,84 @@
+{
+ "wait_ms": 22000,
+ "keepProfile": true,
+ "scenario": "q1-copilot-mcp",
+ "probe": false,
+ "steps": [
+  {
+   "do": "click_xy",
+   "x": 1400,
+   "y": 710
+  },
+  {
+   "do": "wait",
+   "ms": 800
+  },
+  {
+   "do": "click_xy",
+   "x": 1264,
+   "y": 818
+  },
+  {
+   "do": "wait",
+   "ms": 1500
+  },
+  {
+   "do": "click_xy",
+   "x": 1060,
+   "y": 786
+  },
+  {
+   "do": "wait",
+   "ms": 1500
+  },
+  {
+   "do": "click_xy",
+   "x": 1280,
+   "y": 781
+  },
+  {
+   "do": "type",
+   "text": "List my Azure resource groups using the azure tool."
+  },
+  {
+   "do": "press",
+   "key": "Enter"
+  },
+  {
+   "do": "wait",
+   "ms": 40000
+  },
+  {
+   "do": "shot",
+   "name": "sent"
+  },
+  {
+   "do": "text"
+  }
+ ],
+ "pathPrepend": "C:\\Users\\USER\\Local\\apim-harness-test\\fakeaz",
+ "extDir": "C:\\Users\\USER\\Local\\apim-harness-test\\vscode-ext-none",
+ "settings": {
+  "chat.mcp.autostart": "newAndOutdated",
+  "chat.agent.enabled": true,
+  "mcp": {
+   "servers": {
+    "azure": {
+     "type": "stdio",
+     "command": "C:/Users/USER/Local/apim-harness-test/azure-mcp/node_modules/@azure/mcp-win32-x64/dist/azmcp.exe",
+     "args": [
+      "server",
+      "start",
+      "--read-only",
+      "--disable-proxy-tools"
+     ],
+     "env": {
+      "AZURE_MCP_COLLECT_TELEMETRY": "false",
+      "AZURE_MCP_COLLECT_TELEMETRY_MICROSOFT": "false",
+      "AZURE_TOKEN_CREDENTIALS": "AzureCliCredential"
+     }
+    }
+   }
+  }
+ }
+}

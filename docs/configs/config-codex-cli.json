@@ -1,0 +1,158 @@
+{
+  "id": "codex-cli",
+  "harness": "Codex CLI",
+  "product_versions": [
+    "0.153.2"
+  ],
+  "os": [
+    "windows"
+  ],
+  "config_locations": [
+    "%USERPROFILE%\\.codex\\config.toml (user; CODEX_HOME relocates the folder)",
+    "project .codex\\config.toml (ignores model_provider, model_providers, openai_base_url, chatgpt_base_url, notify, profile, otel)"
+  ],
+  "supports_byok": true,
+  "requires_parent_login_for_byok": false,
+  "can_disable_login_prompt": true,
+  "can_disable_login_prompt_note": "With a custom provider and a command-backed token no ChatGPT sign-in screen or prompt appears.",
+  "telemetry_controls": [
+    {
+      "setting": "features.plugins / remote_plugin / plugin_sharing / apps / in_app_updates",
+      "where": "config.toml",
+      "value": "false",
+      "default": "stable, on",
+      "effect": "Stops plugin catalog and curated plugin sync (chatgpt.com, github.com), app and connector integration, in-app updates. Which single flag matters most is not established.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "analytics.enabled",
+      "where": "config.toml",
+      "value": "false",
+      "default": "unset (client default applies)",
+      "effect": "Disables anonymous usage and health data; also disables custom OTLP metrics exporters.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "feedback.enabled",
+      "where": "config.toml",
+      "value": "false",
+      "default": "true",
+      "effect": "Rejects /feedback submissions (user-initiated). Documented, effect not confirmed.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "otel.metrics_exporter",
+      "where": "config.toml",
+      "value": "none",
+      "default": "statsig",
+      "effect": "Disables metrics export independently of logs and traces. Documented, effect not confirmed.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "otel.exporter / otel.trace_exporter",
+      "where": "config.toml",
+      "value": "none",
+      "default": "none for exporter",
+      "effect": "Log and trace export off unless configured.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "web_search",
+      "where": "config.toml",
+      "value": "disabled",
+      "default": "cached",
+      "effect": "Removes the web search tool; full-access sandbox defaults to live. Documented, effect not confirmed.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "mcp_servers.<id>.enabled",
+      "where": "config.toml",
+      "value": "false",
+      "default": "true",
+      "effect": "Disables one MCP server without removing its configuration.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "check_for_update_on_startup",
+      "where": "config.toml",
+      "value": "false",
+      "default": "not stated",
+      "effect": "Stops the update check; documentation advises false only when updates are centrally managed.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "history.persistence",
+      "where": "config.toml",
+      "value": "none",
+      "default": "save-all",
+      "effect": "Local only; no network effect.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "forced_login_method",
+      "where": "config.toml",
+      "value": "api",
+      "default": "not stated",
+      "effect": "Restricts authentication method; whether it avoids chatgpt.com calls is not stated.",
+      "evidence": "documented"
+    },
+    {
+      "setting": "features = {...false} + analytics = { enabled = false }",
+      "where": "config.toml",
+      "value": "as in snippet",
+      "default": "defaults",
+      "effect": "No connection outside the gateway was opened during a prompt.",
+      "evidence": "observed"
+    }
+  ],
+  "auth": {
+    "method": "[model_providers.<id>.auth] command, args, timeout_ms, refresh_interval_ms; printed token sent as Authorization: Bearer",
+    "native_helper_command": true,
+    "static_key_supported": true,
+    "custom_headers_supported": true,
+    "notes": "timeout_ms default 5000 must exceed helper time (15000 used). refresh_interval_ms default 300000; 0 refreshes only after an authentication retry. A 401 re-runs the helper and retries. Cannot be combined with env_key, experimental_bearer_token or requires_openai_auth. Provider id cannot be openai, ollama or lmstudio. Custom headers via http_headers and env_http_headers; query_params for api-version."
+  },
+  "api_formats": [
+    "openai-responses (POST <base_url>/responses, SSE); wire_api = responses is the only documented value"
+  ],
+  "model_discovery_endpoint_behaviour": "GET <base_url>/models?client_version=<v> several times at startup; expects {\"models\": [...]}. A {\"data\": [...]} list gives a non-fatal decode error and generic model metadata. Whether model_catalog_json suppresses the call is not documented.",
+  "config_snippets": [
+    {
+      "file": "%USERPROFILE%\\.codex\\config.toml",
+      "format": "toml",
+      "content": "model = \"<deployment-name>\"\nmodel_provider = \"apim\"\nfeatures = { plugins = false, remote_plugin = false, plugin_sharing = false, apps = false, in_app_updates = false }\nanalytics = { enabled = false }\n\n[model_providers.apim]\nname = \"Azure APIM\"\nbase_url = \"https://<apim-host>/<openai-responses-api-path>\"\nwire_api = \"responses\"\n# Only if the gateway needs them:\n# query_params = { api-version = \"<version>\" }\n# http_headers = { \"Ocp-Apim-Subscription-Key\" = \"<subscription-key>\" }\n\n[model_providers.apim.auth]\ncommand = \"powershell\"\nargs = [\"-NoProfile\", \"-File\", 'C:\\Users\\<you>\\bin\\get-apim-token.ps1']\ntimeout_ms = 15000\nrefresh_interval_ms = 1800000"
+    },
+    {
+      "file": "%USERPROFILE%\\.codex\\config.toml (optional extra keys, documented, not confirmed)",
+      "format": "toml",
+      "content": "web_search = \"disabled\"\nfeedback = { enabled = false }\notel = { exporter = \"none\", metrics_exporter = \"none\" }"
+    },
+    {
+      "file": "get-apim-token.ps1",
+      "format": "powershell",
+      "content": "# Prints ONLY the raw JWT to stdout; on any problem prints a one-line reason to stderr and exits 1.\n# Failing fast matters: both Claude Code and Codex retry hard on a bad token.\n$Scope       = 'api://<apim-app-id>/.default'\n$ExpectedAud = @('api://<apim-app-id>', '<apim-app-client-id>')   # accept both token forms\n$MinLifeSecs = 60\n\n$lines = & az account get-access-token --scope $Scope --query accessToken -o tsv 2>$null\nif ($LASTEXITCODE -ne 0) { [Console]::Error.WriteLine(\"get-apim-token: az failed (exit $LASTEXITCODE). Run: az login\"); exit 1 }\n\n# Tolerate banners/warnings on stdout: keep only the line that looks like a JWT.\n$jwt = $lines | ForEach-Object { \"$_\".Trim() } | Where-Object { $_ -match '^eyJ[\\w-]+\\.[\\w-]+\\.[\\w-]+$' } | Select-Object -Last 1\nif (-not $jwt) { [Console]::Error.WriteLine('get-apim-token: az output contained no JWT'); exit 1 }\n\n# Sanity-check the claims so a wrong audience or nearly-expired token fails here, not as an endless 401 loop.\n$p = $jwt.Split('.')[1].Replace('-', '+').Replace('_', '/')\nwhile ($p.Length % 4) { $p += '=' }\n$claims = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($p)) | ConvertFrom-Json\n$now = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()\nif ($ExpectedAud -notcontains $claims.aud) { [Console]::Error.WriteLine(\"get-apim-token: token aud is '$($claims.aud)', expected '$($ExpectedAud -join \"' or '\")'\"); exit 1 }\nif ($claims.exp - $now -lt $MinLifeSecs) { [Console]::Error.WriteLine(\"get-apim-token: token expires in $($claims.exp - $now)s\"); exit 1 }\n\n[Console]::Out.Write($jwt)"
+    }
+  ],
+  "hosts_default": [
+    "chatgpt.com",
+    "ab.chatgpt.com",
+    "github.com",
+    "api.github.com"
+  ],
+  "hosts_after_config": [],
+  "limits": [
+    "Plugins, app and connector integrations and in-app updates are unavailable.",
+    "No environment variable or command-line flag is documented to disable analytics, updates, feedback or plugin sync; no single offline switch.",
+    "Model metadata for deployment names is generic when the /models shape differs.",
+    "Only the Responses wire format is supported for a custom provider.",
+    "Hosted tools (web search, MCP, apps) are not governed by the sandbox network settings."
+  ],
+  "verification_status": "verified: command-backed authentication, refresh and failure behaviour, query_params and http_headers, network switch set. Optional extra keys (feedback, otel, web_search) not verified. Not verified against a production gateway.",
+  "references": [
+    "https://developers.openai.com/codex/config-advanced",
+    "https://learn.chatgpt.com/docs/config-file/config-reference",
+    "https://learn.chatgpt.com/docs/config-file/config-basic",
+    "https://learn.chatgpt.com/docs/config-file/environment-variables"
+  ],
+  "self_contained": true
+}

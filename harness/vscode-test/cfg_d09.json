@@ -1,0 +1,36 @@
+{
+  "modelsJson": "../vscode-cfg/via_proxy_responses.json",
+  "pathPrepend": "C:\\Users\\USER\\Local\\apim-harness-test\\fakeaz",
+  "scenario": "d09-codex-ext",
+  "steps": [
+    {
+      "do": "click_xy",
+      "y": 851,
+      "x": 1190
+    },
+    {
+      "do": "wait",
+      "ms": 1500
+    },
+    {
+      "do": "click_xy",
+      "y": 767,
+      "x": 1208
+    },
+    {
+      "do": "wait",
+      "ms": 12000
+    },
+    {
+      "do": "shot",
+      "name": "codex-panel"
+    },
+    {
+      "do": "webview_text"
+    }
+  ],
+  "env": {
+    "CODEX_HOME": "C:\\Users\\USER\\Local\\apim-harness-test\\work\\codex-vsext"
+  },
+  "wait_ms": 14000
+}

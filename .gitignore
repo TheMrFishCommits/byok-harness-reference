@@ -1,0 +1,21 @@
+# secrets and generated material
+*.pem
+keys/
+logs/
+work/
+results/
+*.log
+
+# environments and downloads
+.venv/
+.venv-*/
+node_modules/
+.vscode-test/
+vscode-ext*/
+jetbrains/pycharm/
+azcli/
+
+# screenshots and renders (may show private content)
+*.png
+*.pdf
+pdf/

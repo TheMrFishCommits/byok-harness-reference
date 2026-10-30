@@ -1,0 +1,15 @@
+{
+  "scenario": "d03-chat-send-proxy",
+  "modelsJson": "../vscode-cfg/via_proxy_responses.json",
+  "wait_ms": 15000,
+  "steps": [
+    {"do": "palette", "text": "Chat: Open Chat"},
+    {"do": "wait", "ms": 3000},
+    {"do": "click_text", "text": "Describe what to build"},
+    {"do": "type", "text": "Reply with the single word: ok"},
+    {"do": "press", "key": "Enter"},
+    {"do": "wait", "ms": 15000},
+    {"do": "shot", "name": "after-send"},
+    {"do": "text"}
+  ]
+}

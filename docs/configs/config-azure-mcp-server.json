@@ -1,0 +1,195 @@
+{
+  "id": "azure-mcp-server",
+  "harness": "Azure MCP Server (MCP tool server used by harnesses)",
+  "product_versions": [
+    "@azure/mcp 4.0.0-beta.3"
+  ],
+  "os": [
+    "Windows x64"
+  ],
+  "config_locations": [
+    "Claude Code: ~/.claude.json mcpServers (user scope) or .mcp.json",
+    "Codex: config.toml [mcp_servers.<name>]",
+    "GitHub Copilot CLI: ~/.copilot/mcp-config.json mcpServers",
+    "VS Code: .vscode/mcp.json servers (documented)",
+    "JetBrains AI Assistant: Tools > AI Assistant > Model Context Protocol (MCP) (not exercised)"
+  ],
+  "uses_language_model": false,
+  "server_capabilities": [
+    "tools",
+    "logging"
+  ],
+  "requires_parent_login": false,
+  "requires_azure_credentials": true,
+  "authentication": {
+    "method": "credential chain (environment, Visual Studio, VS Code, Azure CLI, Azure PowerShell, Azure Developer CLI, interactive browser)",
+    "pin_credential_env": "AZURE_TOKEN_CREDENTIALS",
+    "production_profile": "AZURE_TOKEN_CREDENTIALS=prod (environment, workload identity, managed identity)",
+    "token_passthrough_stdio": "not documented",
+    "http_transport": "accepts inbound Entra bearer tokens; --outgoing-auth-strategy UseOnBehalfOf | UseHostingEnvironmentIdentity",
+    "failure_behaviour": "tool call returns JSON status 401 naming the failed credential; no browser opens when a credential is pinned",
+    "evidence": "documented and observed"
+  },
+  "start_command": "azmcp.exe server start --read-only --disable-proxy-tools",
+  "start_options": [
+    {
+      "option": "--read-only",
+      "default": "off",
+      "effect": "full mode 426 tools -> 235; 139 destructive tools removed",
+      "evidence": "observed"
+    },
+    {
+      "option": "--mode",
+      "default": "namespace",
+      "effect": "namespace 68 tools; all 426 (235 read-only); single 1 tool named azure",
+      "evidence": "observed"
+    },
+    {
+      "option": "--namespace",
+      "default": "all",
+      "effect": "expose chosen services only (storage: 4 tools)",
+      "evidence": "observed"
+    },
+    {
+      "option": "--tool",
+      "default": "none",
+      "effect": "expose named tools; switches to all mode",
+      "evidence": "documented"
+    },
+    {
+      "option": "--disable-proxy-tools",
+      "default": "off",
+      "effect": "removes documentation, azd, foundry, arm (68 -> 64)",
+      "evidence": "observed"
+    },
+    {
+      "option": "--transport",
+      "default": "stdio",
+      "effect": "HTTP transport documented for central hosting",
+      "evidence": "documented"
+    },
+    {
+      "option": "--cloud",
+      "default": "AzureCloud",
+      "effect": "sovereign cloud selection",
+      "evidence": "documented"
+    }
+  ],
+  "telemetry_controls": [
+    {
+      "setting": "AZURE_MCP_COLLECT_TELEMETRY",
+      "where": "environment of the server",
+      "value": "false",
+      "default": "on",
+      "effect": "alone leaves one telemetry endpoint attempt and a metadata-service probe",
+      "evidence": "observed"
+    },
+    {
+      "setting": "AZURE_MCP_COLLECT_TELEMETRY_MICROSOFT",
+      "where": "environment of the server",
+      "value": "false",
+      "default": "on",
+      "effect": "with the setting above, no external connection at start-up",
+      "evidence": "observed"
+    },
+    {
+      "setting": "--disable-proxy-tools",
+      "where": "command line",
+      "value": "present",
+      "default": "proxy tools on",
+      "effect": "removes tools that forward to remote services; stops start-up contact with learn.microsoft.com in all mode",
+      "evidence": "observed"
+    }
+  ],
+  "hosts_default": [
+    "centralus-2.in.applicationinsights.azure.com",
+    "westus-0.in.applicationinsights.azure.com",
+    "169.254.169.254"
+  ],
+  "hosts_after_config": [],
+  "hosts_all_mode_start": [
+    "login.microsoftonline.com",
+    "learn.microsoft.com"
+  ],
+  "hosts_on_real_calls": {
+    "hosts": [
+      "login.microsoftonline.com",
+      "management.azure.com",
+      "service data-plane hosts"
+    ],
+    "evidence": "documented / static (not observed without a sign-in)"
+  },
+  "proxy_support": {
+    "HTTPS_PROXY": true,
+    "HTTP_PROXY": true,
+    "NO_PROXY": true,
+    "custom_ca": "not documented",
+    "evidence": "observed (proxy env)"
+  },
+  "private_endpoints": {
+    "stdio_server": "calls Azure from the local machine; needs a network path (VPN, ExpressRoute, private DNS)",
+    "central_hosting": "HTTP transport with --outgoing-auth-strategy",
+    "ssrf_protections": "disable flag exists per namespace; whether private addresses are blocked is not documented",
+    "evidence": "documented"
+  },
+  "harness_registration": {
+    "claude_code": {
+      "registered": true,
+      "note": "claude mcp list shows connected; large tool sets are deferred, ENABLE_TOOL_SEARCH=false loads them; tool called through the harness",
+      "evidence": "observed"
+    },
+    "codex": {
+      "registered": true,
+      "note": "codex mcp list shows enabled; use a Windows path for command; tools are added from the second model request of a run under the group mcp__azure; tool called through the harness up to the authentication step",
+      "evidence": "observed"
+    },
+    "copilot_cli": {
+      "registered": true,
+      "note": "tools named azure-mcp-<tool>; --allow-tool 'azure-mcp'; works in offline BYOK mode; tool called through the harness",
+      "evidence": "observed"
+    },
+    "vscode": {
+      "registered": true,
+      "note": "servers root key in .vscode/mcp.json or the user-level mcp.json; MCP: List Servers then Start Server shows Running and the log reports 64 tools with --read-only --disable-proxy-tools; works signed out; tool called from Copilot Chat (BYOK model): the tool ran and returned a failure with no Azure sign-in",
+      "evidence": "observed"
+    },
+    "jetbrains": {
+      "registered": true,
+      "note": "Settings > Tools > AI Assistant > Model Context Protocol (MCP) > Add server; paste the mcpServers JSON; level Global saves to ~/.ai/mcp/mcp.json, Project saves to .ai/mcp/mcp.json; Apply turns the status to a green check and the server process starts; AI Assistant chat offers the server's tools (99 tools in the request) and a tool call returned the server's answer to the model; keep the window open a few seconds after Apply so the file is written",
+      "evidence": "observed"
+    }
+  },
+  "config_snippets": [
+    {
+      "file": "~/.claude.json",
+      "format": "json",
+      "content": "{\"mcpServers\":{\"azure\":{\"type\":\"stdio\",\"command\":\"C:\\\\path\\\\to\\\\azmcp.exe\",\"args\":[\"server\",\"start\",\"--read-only\",\"--disable-proxy-tools\"],\"env\":{\"AZURE_MCP_COLLECT_TELEMETRY\":\"false\",\"AZURE_MCP_COLLECT_TELEMETRY_MICROSOFT\":\"false\",\"AZURE_TOKEN_CREDENTIALS\":\"AzureCliCredential\"}}}}"
+    },
+    {
+      "file": "config.toml",
+      "format": "toml",
+      "content": "[mcp_servers.azure]\ncommand = 'C:\\path\\to\\azmcp.exe'\nargs = ['server', 'start', '--read-only', '--disable-proxy-tools']\nenv = { AZURE_MCP_COLLECT_TELEMETRY = 'false', AZURE_MCP_COLLECT_TELEMETRY_MICROSOFT = 'false', AZURE_TOKEN_CREDENTIALS = 'AzureCliCredential' }"
+    },
+    {
+      "file": "~/.copilot/mcp-config.json",
+      "format": "json",
+      "content": "{\"mcpServers\":{\"azure-mcp\":{\"type\":\"local\",\"command\":\"C:\\\\path\\\\to\\\\azmcp.exe\",\"args\":[\"server\",\"start\",\"--read-only\",\"--disable-proxy-tools\"],\"env\":{\"AZURE_MCP_COLLECT_TELEMETRY\":\"false\",\"AZURE_MCP_COLLECT_TELEMETRY_MICROSOFT\":\"false\",\"AZURE_TOKEN_CREDENTIALS\":\"AzureCliCredential\"},\"tools\":[\"*\"]}}}"
+    }
+  ],
+  "limits": [
+    "read-only removes write tools; secret and connection-string reads still prompt for confirmation unless elicitation is disabled",
+    "removing proxy tools removes remote documentation, azd, foundry and ARM tools",
+    "uses the signed-in identity: anything the account can read is readable through the model",
+    "the Azure CLI on the PATH must print only JSON",
+    "documentation describes the local server as intended for developer use within an organisation"
+  ],
+  "verification_status": "partly-verified: standalone server and read-only filtering verified; Claude Code, Codex, Copilot CLI, VS Code Copilot Chat and JetBrains AI Assistant chat each called a tool through the harness up to the server's authentication or argument answer; results with real credentials not obtained",
+  "references": [
+    "https://learn.microsoft.com/azure/developer/azure-mcp-server/",
+    "https://github.com/microsoft/mcp",
+    "https://aka.ms/azmcp/auth",
+    "https://aka.ms/azmcp/troubleshooting",
+    "https://modelcontextprotocol.io/"
+  ],
+  "self_contained": true
+}

@@ -1,0 +1,13 @@
+{
+  "scenario": "d04-pick-byok-model",
+  "modelsJson": "../vscode-cfg/via_proxy_responses.json",
+  "wait_ms": 15000,
+  "steps": [
+    {"do": "palette", "text": "Chat: Open Chat"},
+    {"do": "wait", "ms": 3000},
+    {"do": "palette", "text": "Change Model"},
+    {"do": "wait", "ms": 2500},
+    {"do": "shot", "name": "change-model"},
+    {"do": "text"}
+  ]
+}

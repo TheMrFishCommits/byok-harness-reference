@@ -1,0 +1,20 @@
+{
+  "steps": [
+    {
+      "do": "wait",
+      "ms": 45000
+    }
+  ],
+  "modelsJson": "../vscode-cfg/via_proxy_responses.json",
+  "args": [
+    "--log-net-log={base}\\netlog.json"
+  ],
+  "extDir": "C:\\Users\\USER\\Local\\apim-harness-test\\vscode-ext-none",
+  "pathPrepend": "C:\\Users\\USER\\Local\\apim-harness-test\\fakeaz",
+  "env": {
+    "CODEX_HOME": "C:\\Users\\USER\\Local\\apim-harness-test\\work\\codex-null"
+  },
+  "probe": false,
+  "wait_ms": 14000,
+  "scenario": "h0-vscode-bare"
+}

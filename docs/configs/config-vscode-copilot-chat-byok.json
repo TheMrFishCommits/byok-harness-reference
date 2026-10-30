@@ -1,0 +1,267 @@
+{
+  "id": "config-vscode-copilot-chat-byok",
+  "harness": "Visual Studio Code with built-in GitHub Copilot Chat (Custom Endpoint BYOK)",
+  "product_versions": [
+    "VS Code 1.142.0",
+    "GitHub Copilot Chat 0.70.0"
+  ],
+  "os": [
+    "Windows 11"
+  ],
+  "config_locations": [
+    {
+      "path": "%APPDATA%\\Code\\User\\chatLanguageModels.json",
+      "scope": "user profile",
+      "note": "location not stated in the documentation",
+      "evidence": "observed"
+    },
+    {
+      "path": "settings.json",
+      "scope": "user or workspace",
+      "evidence": "documented"
+    },
+    {
+      "path": "HKLM or HKCU Software\\Policies\\Microsoft\\VSCode",
+      "scope": "machine policy",
+      "evidence": "documented"
+    }
+  ],
+  "supports_byok": true,
+  "requires_parent_login_for_byok": {
+    "value": false,
+    "note": "BYOK models work in the Local chat session without a GitHub account or Copilot plan. Inline suggestions, semantic search and embedding-based features still need GitHub. Copilot session type, Copilot Fusion and HydraFusion need GitHub.",
+    "evidence": "documented and observed"
+  },
+  "can_disable_login_prompt": {
+    "value": false,
+    "how": "Sign-in is optional for BYOK chat, but no documented setting hides the Sign In affordance or the default Auto model; select the BYOK model in the picker",
+    "evidence": "observed"
+  },
+  "telemetry_controls": [
+    {
+      "setting": "telemetry.telemetryLevel (policy TelemetryLevel)",
+      "where": "settings.json",
+      "value": "off",
+      "default": "all",
+      "effect": "Stops usage, error and crash telemetry; some third-party extensions may not respect it",
+      "evidence": "documented"
+    },
+    {
+      "setting": "telemetry.telemetryLevel",
+      "where": "settings.json",
+      "value": "off",
+      "default": "all",
+      "effect": "One request to westus-0.in.applicationinsights.azure.com was still attempted",
+      "evidence": "observed"
+    },
+    {
+      "setting": "update.mode (policy UpdateMode)",
+      "where": "settings.json",
+      "value": "none",
+      "default": "default",
+      "effect": "Stops update checks to update.code.visualstudio.com",
+      "evidence": "documented"
+    },
+    {
+      "setting": "extensions.autoCheckUpdates",
+      "where": "settings.json",
+      "value": "false",
+      "default": "true",
+      "effect": "Marketplace requests stopped when combined with extensions.autoUpdate=false and workbench.enableExperiments=false; individual contribution not isolated",
+      "evidence": "observed"
+    },
+    {
+      "setting": "extensions.autoUpdate (policy ExtensionsAutoUpdate)",
+      "where": "settings.json",
+      "value": "false",
+      "default": "true",
+      "effect": "Stops automatic extension updates",
+      "evidence": "documented"
+    },
+    {
+      "setting": "workbench.enableExperiments",
+      "where": "settings.json",
+      "value": "false",
+      "default": "true",
+      "effect": "Intended to stop the experiment service (default.exp-tas.com); telemetry level off documented to disable A/B experimentation",
+      "evidence": "inferred"
+    },
+    {
+      "setting": "update.showReleaseNotes",
+      "where": "settings.json",
+      "value": "false",
+      "default": "true",
+      "effect": "Avoids release notes fetch; effect not confirmed",
+      "evidence": "inferred"
+    },
+    {
+      "setting": "chat.utilityModel / chat.utilitySmallModel",
+      "where": "settings.json",
+      "value": "a BYOK model",
+      "default": "unset",
+      "effect": "Removes the Set BYOK utility models prompt; utility tasks (titles, commit messages, rename suggestions) use the BYOK model",
+      "evidence": "documented"
+    },
+    {
+      "setting": "chat.agentHost.byokModels.enabled",
+      "where": "settings.json",
+      "value": "true",
+      "default": "false",
+      "effect": "Experimental; documented as required for Copilot harness sessions; enabled in the working configuration; necessity for the Local session not established",
+      "evidence": "documented"
+    },
+    {
+      "setting": "telemetry.feedback.enabled (policy EnableFeedback)",
+      "where": "settings.json",
+      "value": "false",
+      "default": "true",
+      "effect": "Turns off issue reporter and surveys; effect not confirmed",
+      "evidence": "documented"
+    },
+    {
+      "setting": "ExtensionGalleryServiceUrl / AllowedExtensions (extensions.allowed)",
+      "where": "policy",
+      "value": "organization value",
+      "default": "not set",
+      "effect": "Repoints or restricts the extension gallery; effect not confirmed",
+      "evidence": "documented"
+    },
+    {
+      "setting": "ChatApprovedAccountOrganizations",
+      "where": "policy",
+      "value": "do not set",
+      "default": "not set",
+      "effect": "Blocks all AI features until a matching sign-in exists",
+      "evidence": "documented"
+    },
+    {
+      "setting": "chat remote configuration fetch (main.vscode-cdn.net), Azure metadata probe (169.254.169.254), single offline mode",
+      "where": "none",
+      "value": "none documented",
+      "default": "n/a",
+      "effect": "No setting or policy documented",
+      "evidence": "documented"
+    }
+  ],
+  "auth": {
+    "method": "local token proxy (placeholder key stored as VS Code secret)",
+    "native_helper_command": false,
+    "native_helper_command_evidence": "not documented",
+    "static_key_supported": true,
+    "custom_headers_supported": true,
+    "notes": "Default header is Authorization: Bearer <apiKey>; x-api-key for the Messages API; api-key for Azure OpenAI URLs. requestHeaders on a model overrides the inferred header; ${apiKey} inside a header value is replaced with the configured key; ${input:...} in requestHeaders is not documented. Entra tokens expire, so point the model url at the local token proxy (Appendix B of the guide); the helper command that supplies the token is Appendix A of the guide. Alternative unverified route: built-in azure provider signs in with the user's Microsoft account when apiKey is unset, scope https://cognitiveservices.azure.com/.default; the gateway must accept that audience."
+  },
+  "api_formats": [
+    {
+      "apiType": "chat-completions",
+      "default": true,
+      "evidence": "documented"
+    },
+    {
+      "apiType": "responses",
+      "evidence": "documented"
+    },
+    {
+      "apiType": "messages",
+      "evidence": "documented"
+    }
+  ],
+  "model_discovery_endpoint_behaviour": "Models are listed from the models array in chatLanguageModels.json. When a customendpoint provider sets a base url and no models array, VS Code discovers models from the endpoint (documented). With an explicit models array VS Code does not call a models endpoint on the gateway (evidence: observed).",
+  "config_snippets": [
+    {
+      "file": "chatLanguageModels.json",
+      "format": "json",
+      "content": "[\n  {\n    \"name\": \"<group-name>\",\n    \"vendor\": \"customendpoint\",\n    \"apiKey\": \"${input:chat.lm.secret.<id>}\",\n    \"apiType\": \"responses\",\n    \"models\": [\n      {\n        \"id\": \"<deployment-name>\",\n        \"name\": \"<display-name>\",\n        \"url\": \"http://127.0.0.1:<proxy-port>/<apim-api-path>/responses\",\n        \"apiType\": \"responses\",\n        \"toolCalling\": true,\n        \"vision\": false,\n        \"maxInputTokens\": 100000,\n        \"maxOutputTokens\": 8000\n      }\n    ]\n  }\n]"
+    },
+    {
+      "file": "settings.json",
+      "format": "json",
+      "content": "{\n  \"telemetry.telemetryLevel\": \"off\",\n  \"update.mode\": \"none\",\n  \"extensions.autoCheckUpdates\": false,\n  \"extensions.autoUpdate\": false,\n  \"workbench.enableExperiments\": false,\n  \"update.showReleaseNotes\": false,\n  \"chat.agentHost.byokModels.enabled\": true\n}"
+    },
+    {
+      "file": "get-apim-token.ps1",
+      "format": "powershell",
+      "content": "# Prints ONLY the raw JWT to stdout; on any problem prints a one-line reason to stderr and exits 1.\n# Failing fast matters: both Claude Code and Codex retry hard on a bad token.\n$Scope       = 'api://<apim-app-id>/.default'\n$ExpectedAud = @('api://<apim-app-id>', '<apim-app-client-id>')   # accept both token forms\n$MinLifeSecs = 60\n\n$lines = & az account get-access-token --scope $Scope --query accessToken -o tsv 2>$null\nif ($LASTEXITCODE -ne 0) { [Console]::Error.WriteLine(\"get-apim-token: az failed (exit $LASTEXITCODE). Run: az login\"); exit 1 }\n\n# Tolerate banners/warnings on stdout: keep only the line that looks like a JWT.\n$jwt = $lines | ForEach-Object { \"$_\".Trim() } | Where-Object { $_ -match '^eyJ[\\w-]+\\.[\\w-]+\\.[\\w-]+$' } | Select-Object -Last 1\nif (-not $jwt) { [Console]::Error.WriteLine('get-apim-token: az output contained no JWT'); exit 1 }\n\n# Sanity-check the claims so a wrong audience or nearly-expired token fails here, not as an endless 401 loop.\n$p = $jwt.Split('.')[1].Replace('-', '+').Replace('_', '/')\nwhile ($p.Length % 4) { $p += '=' }\n$claims = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($p)) | ConvertFrom-Json\n$now = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()\nif ($ExpectedAud -notcontains $claims.aud) { [Console]::Error.WriteLine(\"get-apim-token: token aud is '$($claims.aud)', expected '$($ExpectedAud -join \"' or '\")'\"); exit 1 }\nif ($claims.exp - $now -lt $MinLifeSecs) { [Console]::Error.WriteLine(\"get-apim-token: token expires in $($claims.exp - $now)s\"); exit 1 }\n\n[Console]::Out.Write($jwt)"
+    },
+    {
+      "file": "proxy.py",
+      "format": "python",
+      "content": "\"\"\"Local token-injecting reverse proxy for tools that can only send a static key (VS Code Copilot BYOK, JetBrains, ...).\n\nClients send any dummy key to http://127.0.0.1:<port>; the proxy replaces Authorization with a fresh JWT obtained from a\nhelper command, streams the response back, and retries once on an upstream 401 with a forced token refresh.\n\nusage: proxy.py --upstream https://<apim>.azure-api.net [--port 18081] [--margin-s 300] [--local-key K] -- <helper cmd...>\n\"\"\"\nimport argparse\nimport asyncio\nimport base64\nimport json\nimport sys\nimport time\n\nfrom aiohttp import ClientSession, ClientTimeout, web\n\nHOP = {\"connection\", \"keep-alive\", \"proxy-authenticate\", \"proxy-authorization\", \"te\", \"trailers\",\n       \"transfer-encoding\", \"upgrade\", \"host\", \"content-length\"}\nDROP_IN = {\"authorization\", \"x-api-key\", \"api-key\"}\n\n\nclass TokenSource:\n    def __init__(self, cmd, margin):\n        self.cmd, self.margin, self.tok, self.exp, self.lock, self.fetches = cmd, margin, None, 0, asyncio.Lock(), 0\n\n    async def get(self, force=False):\n        async with self.lock:\n            if not force and self.tok and self.exp - time.time() > self.margin:\n                return self.tok\n            p = await asyncio.create_subprocess_exec(*self.cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)\n            out, err = await asyncio.wait_for(p.communicate(), 30)\n            if p.returncode != 0:\n                raise RuntimeError(err.decode(errors=\"replace\").strip() or f\"helper exited {p.returncode}\")\n            tok = out.decode().strip()\n            seg = tok.split(\".\")[1]\n            claims = json.loads(base64.urlsafe_b64decode(seg + \"=\" * (-len(seg) % 4)))\n            self.tok, self.exp, self.fetches = tok, claims[\"exp\"], self.fetches + 1\n            return tok\n\n\ndef make_app(upstream, tokens, local_key):\n    async def handler(request):\n        if request.path == \"/_proxy/health\":\n            return web.json_response({\"ok\": True, \"token_fetches\": tokens.fetches})\n        if local_key:\n            sent = request.headers.get(\"x-api-key\") or request.headers.get(\"api-key\") or \\\n                   request.headers.get(\"Authorization\", \"\").removeprefix(\"Bearer \").strip()\n            if sent != local_key:\n                return web.json_response({\"error\": \"bad local key\"}, status=401)\n        body = await request.read()\n        fwd = {k: v for k, v in request.headers.items() if k.lower() not in HOP | DROP_IN}\n        url = upstream.rstrip(\"/\") + request.path_qs\n        sess = request.app[\"sess\"]\n        for attempt in (0, 1):\n            try:\n                tok = await tokens.get(force=attempt == 1)\n            except Exception as e:  # noqa: BLE001\n                return web.json_response({\"error\": \"token helper failed\", \"detail\": str(e)}, status=502)\n            async with sess.request(request.method, url, data=body or None,\n                                    headers={**fwd, \"Authorization\": f\"Bearer {tok}\"}, allow_redirects=False) as up:\n                if up.status == 401 and attempt == 0:\n                    continue\n                resp = web.StreamResponse(status=up.status,\n                                          headers={k: v for k, v in up.headers.items() if k.lower() not in HOP})\n                await resp.prepare(request)\n                async for chunk in up.content.iter_any():\n                    await resp.write(chunk)\n                await resp.write_eof()\n                return resp\n\n    async def on_start(app):\n        app[\"sess\"] = ClientSession(auto_decompress=False, timeout=ClientTimeout(total=None, sock_connect=15))\n\n    async def on_stop(app):\n        await app[\"sess\"].close()\n\n    app = web.Application(client_max_size=64 * 1024 * 1024)\n    app.on_startup.append(on_start)\n    app.on_cleanup.append(on_stop)\n    app.router.add_route(\"*\", \"/{tail:.*}\", handler)\n    return app\n\n\ndef main():\n    ap = argparse.ArgumentParser()\n    ap.add_argument(\"--upstream\", required=True)\n    ap.add_argument(\"--port\", type=int, default=18081)\n    ap.add_argument(\"--margin-s\", type=int, default=300)\n    ap.add_argument(\"--local-key\")\n    ap.add_argument(\"helper\", nargs=argparse.REMAINDER)\n    a = ap.parse_args()\n    cmd = [x for x in a.helper if x != \"--\"]\n    web.run_app(make_app(a.upstream, TokenSource(cmd, a.margin_s), a.local_key), host=\"127.0.0.1\", port=a.port, print=lambda *_: None)\n\n\nif __name__ == \"__main__\":\n    sys.exit(main())"
+    }
+  ],
+  "hosts_default": [
+    {
+      "host": "main.vscode-cdn.net",
+      "purpose": "remote chat feature configuration",
+      "evidence": "observed"
+    },
+    {
+      "host": "marketplace.visualstudio.com",
+      "purpose": "extension gallery",
+      "evidence": "observed"
+    },
+    {
+      "host": "www.vscode-unpkg.net",
+      "purpose": "web extensions",
+      "condition": "when extensions are installed",
+      "evidence": "observed"
+    },
+    {
+      "host": "169.254.169.254",
+      "purpose": "Azure instance metadata probe (link-local)",
+      "condition": "seen while chatting with the quiet profile applied",
+      "evidence": "observed"
+    },
+    {
+      "host": "westus-0.in.applicationinsights.azure.com",
+      "purpose": "telemetry",
+      "condition": "seen while chatting with the quiet profile applied",
+      "evidence": "observed"
+    },
+    {
+      "host": "<model url host>",
+      "purpose": "model endpoint",
+      "evidence": "documented"
+    }
+  ],
+  "hosts_after_config": [
+    {
+      "host": "main.vscode-cdn.net",
+      "evidence": "observed"
+    },
+    {
+      "host": "169.254.169.254",
+      "evidence": "observed"
+    },
+    {
+      "host": "westus-0.in.applicationinsights.azure.com",
+      "evidence": "observed"
+    },
+    {
+      "host": "<model url host>",
+      "evidence": "documented"
+    }
+  ],
+  "limits": [
+    "BYOK applies to chat and utility tasks, not inline suggestions, semantic search or embedding-based features",
+    "Default utility models are unavailable without sign-in; set chat.utilityModel and chat.utilitySmallModel",
+    "Copilot Fusion and HydraFusion need a Copilot plan; routing is in GitHub's cloud; no offline setting documented",
+    "Copilot session type needs sign-in; built-in Claude session type lists no models for a Custom Endpoint; Codex session type opens the separate Codex extension",
+    "A literal apiKey in chatLanguageModels.json is not honoured: the model never reaches the chat picker",
+    "No documented setting for the chat.json fetch, the metadata probe, or a single offline mode",
+    "BYOK usage is billed by the provider and does not count against Copilot quotas",
+    "Copilot Business and Enterprise administrators can disable the BYOK policy"
+  ],
+  "verification_status": "verified-runtime",
+  "references": [
+    "https://code.visualstudio.com/docs/agent-customization/language-models",
+    "https://code.visualstudio.com/blogs/2026/06/18/byok-vscode",
+    "https://github.blog/changelog/2026-04-22-bring-your-own-language-model-key-in-vs-code-now-available/",
+    "https://code.visualstudio.com/docs/setup/network",
+    "https://code.visualstudio.com/docs/enterprise/policies",
+    "https://code.visualstudio.com/docs/configure/telemetry",
+    "https://code.visualstudio.com/docs/enterprise/updates",
+    "https://docs.github.com/copilot/concepts/models/copilot-fusion"
+  ],
+  "self_contained": true
+}

@@ -1,0 +1,66 @@
+{
+  "id": "entra-token-helper",
+  "harness": "Entra token helper (get-apim-token.ps1)",
+  "product_versions": [
+    "Windows PowerShell 5.1 or PowerShell 7",
+    "Azure CLI with az account get-access-token --scope (for example 2.91.0)"
+  ],
+  "os": [
+    "windows"
+  ],
+  "config_locations": [
+    "C:\\Users\\<you>\\bin\\get-apim-token.ps1",
+    "Azure CLI state folder (AZURE_CONFIG_DIR relocates)"
+  ],
+  "supports_byok": null,
+  "requires_parent_login_for_byok": null,
+  "can_disable_login_prompt": true,
+  "can_disable_login_prompt_note": "The script never prompts. Sign-in happens only through az login.",
+  "telemetry_controls": [
+    {
+      "setting": "AZURE_CONFIG_DIR",
+      "where": "environment",
+      "value": "folder path",
+      "default": "%USERPROFILE%\\.azure",
+      "effect": "Keeps the Azure CLI sign-in state in a separate folder.",
+      "evidence": "documented"
+    }
+  ],
+  "auth": {
+    "method": "az account get-access-token --scope api://<apim-app-id>/.default; prints the raw JWT to stdout",
+    "native_helper_command": null,
+    "static_key_supported": null,
+    "custom_headers_supported": null,
+    "notes": "Guards: stdout filter keeps only the JWT-shaped line; audience check against $ExpectedAud; lifetime check of 60 seconds. Exit 0 prints the JWT; exit 1 prints one stderr line (az failed, no JWT, wrong audience, token expires in N s). Azure CLI client ID 04b07795-8ddb-461a-bbee-02f9e1bf7b46 must be pre-authorized on the app registration or consented by an administrator. Latency: about 0.6 s for az to fail when not signed in (helper reports in about 0.8 s); token fetch time on a real tenant is not established."
+  },
+  "api_formats": [],
+  "model_discovery_endpoint_behaviour": "not applicable",
+  "config_snippets": [
+    {
+      "file": "C:\\Users\\<you>\\bin\\get-apim-token.ps1",
+      "format": "powershell",
+      "content": "# Prints ONLY the raw JWT to stdout; on any problem prints a one-line reason to stderr and exits 1.\n# Failing fast matters: both Claude Code and Codex retry hard on a bad token.\n$Scope       = 'api://<apim-app-id>/.default'\n$ExpectedAud = @('api://<apim-app-id>', '<apim-app-client-id>')   # accept both token forms\n$MinLifeSecs = 60\n\n$lines = & az account get-access-token --scope $Scope --query accessToken -o tsv 2>$null\nif ($LASTEXITCODE -ne 0) { [Console]::Error.WriteLine(\"get-apim-token: az failed (exit $LASTEXITCODE). Run: az login\"); exit 1 }\n\n# Tolerate banners/warnings on stdout: keep only the line that looks like a JWT.\n$jwt = $lines | ForEach-Object { \"$_\".Trim() } | Where-Object { $_ -match '^eyJ[\\w-]+\\.[\\w-]+\\.[\\w-]+$' } | Select-Object -Last 1\nif (-not $jwt) { [Console]::Error.WriteLine('get-apim-token: az output contained no JWT'); exit 1 }\n\n# Sanity-check the claims so a wrong audience or nearly-expired token fails here, not as an endless 401 loop.\n$p = $jwt.Split('.')[1].Replace('-', '+').Replace('_', '/')\nwhile ($p.Length % 4) { $p += '=' }\n$claims = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($p)) | ConvertFrom-Json\n$now = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()\nif ($ExpectedAud -notcontains $claims.aud) { [Console]::Error.WriteLine(\"get-apim-token: token aud is '$($claims.aud)', expected '$($ExpectedAud -join \"' or '\")'\"); exit 1 }\nif ($claims.exp - $now -lt $MinLifeSecs) { [Console]::Error.WriteLine(\"get-apim-token: token expires in $($claims.exp - $now)s\"); exit 1 }\n\n[Console]::Out.Write($jwt)"
+    }
+  ],
+  "hosts_default": [
+    "Microsoft Entra sign-in and token endpoints (only when a new token is needed)"
+  ],
+  "hosts_after_config": [
+    "Microsoft Entra sign-in and token endpoints (only when a new token is needed)"
+  ],
+  "limits": [
+    "GUI-launched hosts may lack az on PATH; use the full path to az.cmd.",
+    "Tokens last as set by the tenant (typically 60 to 90 minutes); keep caller cache or refresh intervals below it.",
+    "Conditional Access sign-in frequency decides when az login is needed again.",
+    "v1 and v2 tokens can carry different aud values; set $ExpectedAud from a real token.",
+    "The exact Entra host list for a real tenant was not established."
+  ],
+  "verification_status": "partially verified: all script paths (success and each failure) verified; the real Azure CLI verified only when not signed in. A real token for a real tenant is not verified.",
+  "references": [
+    "https://learn.microsoft.com/en-us/cli/azure/account#az-account-get-access-token",
+    "https://learn.microsoft.com/en-us/azure/api-management/validate-jwt-policy",
+    "https://code.claude.com/docs/en/llm-gateway-connect",
+    "https://developers.openai.com/codex/config-advanced"
+  ],
+  "self_contained": true
+}

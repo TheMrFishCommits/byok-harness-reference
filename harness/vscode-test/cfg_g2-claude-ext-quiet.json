@@ -1,0 +1,47 @@
+{
+  "pathPrepend": "C:\\Users\\USER\\Local\\apim-harness-test\\fakeaz",
+  "scenario": "g2-claude-ext-quiet",
+  "env": {
+    "CLAUDE_CONFIG_DIR": "C:\\Users\\USER\\Local\\apim-harness-test\\work\\claude-vsext-quiet"
+  },
+  "wait_ms": 14000,
+  "steps": [
+    {
+      "do": "click_xy",
+      "y": 884,
+      "x": 1355
+    },
+    {
+      "ms": 15000,
+      "do": "wait"
+    },
+    {
+      "do": "click_xy",
+      "y": 794,
+      "x": 745
+    },
+    {
+      "key": "Control+a",
+      "do": "press"
+    },
+    {
+      "do": "type",
+      "text": "Reply with the single word: ok"
+    },
+    {
+      "key": "Enter",
+      "do": "press"
+    },
+    {
+      "ms": 25000,
+      "do": "wait"
+    }
+  ],
+  "modelsJson": "../vscode-cfg/via_proxy_responses.json",
+  "settings": {
+    "workbench.enableExperiments": false,
+    "extensions.autoCheckUpdates": false,
+    "extensions.autoUpdate": false,
+    "update.showReleaseNotes": false
+  }
+}

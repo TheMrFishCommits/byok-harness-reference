@@ -1,0 +1,26 @@
+{
+  "wait_ms": 22000,
+  "steps": [
+    {
+      "x": 1271,
+      "y": 818,
+      "do": "click_xy"
+    },
+    {
+      "do": "wait",
+      "ms": 2500
+    },
+    {
+      "do": "shot",
+      "name": "picker-ui-added"
+    },
+    {
+      "do": "text"
+    }
+  ],
+  "scenario": "j4-byok-ui-added",
+  "probe": false,
+  "keepProfile": true,
+  "pathPrepend": "C:\\Users\\USER\\Local\\apim-harness-test\\fakeaz",
+  "extDir": "C:\\Users\\USER\\Local\\apim-harness-test\\vscode-ext-none"
+}

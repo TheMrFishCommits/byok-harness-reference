@@ -1,0 +1,4 @@
+{
+  "providers": [ { "name": "apim", "type": "openai", "baseUrl": "http://127.0.0.1:18081/openai/v1", "apiKey": "dummy-local-key", "wireApi": "responses" } ],
+  "models": [ { "id": "gpt-test", "provider": "apim", "maxPromptTokens": 100000, "maxOutputTokens": 8000 } ]
+}

@@ -1,0 +1,27 @@
+{
+  "scenario": "d12-claude-ext",
+  "modelsJson": "../vscode-cfg/via_proxy_responses.json",
+  "steps": [
+    {
+      "y": 884,
+      "do": "click_xy",
+      "x": 1355
+    },
+    {
+      "do": "wait",
+      "ms": 15000
+    },
+    {
+      "do": "shot",
+      "name": "claude-panel"
+    },
+    {
+      "do": "frames"
+    }
+  ],
+  "wait_ms": 14000,
+  "env": {
+    "CLAUDE_CONFIG_DIR": "C:\\Users\\USER\\Local\\apim-harness-test\\work\\claude-vsext"
+  },
+  "pathPrepend": "C:\\Users\\USER\\Local\\apim-harness-test\\fakeaz"
+}

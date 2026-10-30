@@ -1,0 +1,19 @@
+{
+  "scenario": "d08-codex-harness",
+  "modelsJson": "../vscode-cfg/via_proxy_responses.json",
+  "wait_ms": 14000,
+  "steps": [
+    {"do": "click_xy", "x": 1190, "y": 851},
+    {"do": "wait", "ms": 1500},
+    {"do": "click_xy", "x": 1208, "y": 767},
+    {"do": "wait", "ms": 4000},
+    {"do": "shot", "name": "codex-selected"},
+    {"do": "text"},
+    {"do": "click_xy", "x": 1290, "y": 781},
+    {"do": "type", "text": "Reply with the single word: ok"},
+    {"do": "press", "key": "Enter"},
+    {"do": "wait", "ms": 20000},
+    {"do": "shot", "name": "after-send"},
+    {"do": "text"}
+  ]
+}
